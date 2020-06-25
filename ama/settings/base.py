@@ -163,7 +163,7 @@ AUTH_USER_MODEL = 'authentication.User'
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-django_heroku.settings.base(locals())
+django_heroku.settings(locals())
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
