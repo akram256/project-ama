@@ -10,14 +10,13 @@ from decimal import Decimal
 
 class User(AbstractBaseUser, PermissionsMixin, BaseAbstractModel):
     """This is a user model """
-
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     first_name = models.CharField(max_length=255, blank=True, null=True)
     last_name = models.CharField(max_length=255, blank=True, null=True)
     email = models.EmailField(blank=True,unique=True, null=True)
-    is_staff = models.BooleanField(default=True)
-    is_active = models.BooleanField(default=True)
-    is_superuser = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name','last_name',]
