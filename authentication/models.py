@@ -10,6 +10,7 @@ from decimal import Decimal
 
 class User(AbstractBaseUser, PermissionsMixin, BaseAbstractModel):
     """This is a user model """
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     first_name = models.CharField(max_length=255, blank=True, null=True)
     last_name = models.CharField(max_length=255, blank=True, null=True)
