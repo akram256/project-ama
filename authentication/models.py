@@ -40,3 +40,38 @@ class User(AbstractBaseUser, PermissionsMixin, BaseAbstractModel):
         }, settings.SECRET_KEY, algorithm='HS256')
 
         return token.decode('utf-8')
+
+class School(AbstractBaseUser):
+    """This is model for a school"""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    school_name = models.CharField(max_length=255, blank=True, null=True)
+    school_email = models.CharField(max_length=255, blank=True, null=True)
+    school_address= models.CharField(max_length=255, blank=True, null=True)
+    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
+
+    USERNAME_FIELD = 'school_email'
+    REQUIRED_FIELDS = ['school_name',]
+    objects = UserManager()
+
+    def __str__(self):
+        if self.school_name:
+            return "{}".format(self.school_name)
+        return "{}".format(self.school_email)
+
+    @property
+    def token(self):
+        return self._generate_jwt_token()
+
+    def _generate_jwt_token(self):
+        dt = datetime.now() + timedelta(days=365)
+
+        token = jwt.encode({
+            'id': str(self.pk),
+            'exp': int(dt.strftime('%s'))
+        }, settings.SECRET_KEY, algorithm='HS256')
+
+        return token.decode('utf-8')
+ 

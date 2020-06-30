@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User
+from .models import User, School
 from django.contrib.auth.admin import UserAdmin
 from django.http import HttpResponse
 import csv
@@ -44,6 +44,16 @@ class CustomUserAdmin(UserAdmin, ExportCsvMixin):
     actions = ["export_as_csv"]
 
 admin.site.register(User, CustomUserAdmin)
+
+@admin.register(School)
+class SchoolAdmin(admin.ModelAdmin):
+    list_display = ('school_email','school_name','school_address',)
+    # list_filter = ( ('created_at',DateRangeFilter),)
+    search_fields = ('created_at','school_email','school_name')
+
 admin.site.site_header = "AMA Admin Portal"
 admin.site.site_title = "AMA Admin Portal"
 admin.site.index_title = "Welcome to AMA Admin Portal"
+
+
+

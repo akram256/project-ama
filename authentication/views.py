@@ -29,8 +29,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import ListAPIView,RetrieveUpdateDestroyAPIView,ListCreateAPIView,RetrieveUpdateAPIView
 from rest_framework.views import APIView
 
-from .serializers import RegistrationSerializer,LoginSerializer
-from authentication.models import User
+from .serializers import RegistrationSerializer,LoginSerializer,SchoolRegistrationSerializer,SchoolLoginSerializer
+from authentication.models import User, School
 from utils import services
 
 logger = logging.getLogger(__name__)
@@ -98,7 +98,7 @@ class LoginAPIView(APIView):
             user = authenticate(email=email, password=password) 
             if user is None:
                 users = User.objects.all()
-                return Response ({'Invalid number or password'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response ({'Invalid email or password'}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 if not user.is_active:
                     raise serializers.ValidationError(
@@ -116,4 +116,90 @@ class LoginAPIView(APIView):
             return Response(resp, status=status.HTTP_200_OK)
                 
         return Response({'message': "Invalid credentials", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class SchoolRegistrationAPIView(generics.GenericAPIView):
+
+    """Register new school users."""
+
+    serializer_class = SchoolRegistrationSerializer
+    permission_class = (AllowAny,)
+
+    def post(self, request):
+        school_users = School.objects.all()
+        serializer = self.serializer_class(data=request.data)
+        password = request.data.get('password')
+        school_email = request.data.get('school_email')
+        school_name=request.data.get('school_name')
+        school_address=request.data.get('school_address')
+        school_email= str(school_email)
+        print(school_email)
+        school_email = school_email.lower()
+        email_pattern = services.EMAIL_PATTERN
+        password_pattern = services.PASSWORD_PATTERN
+        url_param = get_current_site(request).domain
+
+        if not re.match(password_pattern,password):
+            return Response({'message':'Password is weak, please use atleast 1 UPPERCASE, 1 LOWERCASE, 1 SYMBOL',}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if re.match(email_pattern,school_email):
+            user = [i for i in school_users if i.school_email == school_email]
+            if user:
+                return Response({'message':'This email: {} , already belongs to a user on ama'.format(school_email),}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                logger.info('email looks good')
+        else:
+            return Response({'message':'Email: {} is not valid'.format(school_email),}, status=status.HTTP_400_BAD_REQUEST)
+        if serializer.is_valid(raise_exception=True):
+            user=School(school_email=school_email,password=password,school_name=school_name,school_address=school_address,is_active=True)
+            user.set_password(password)
+            user.save()
+            # email_verification_url=reverse('Auth:verify')
+            # full_url= request.build_absolute_uri(email_verification_url + '?token='+user.token)
+            # email_data = {'subject':'Welcome To Africa My Africa','email_from':settings.EMAIL_FROM}
+            # content = render_to_string('activate_account.html',{'token':'{}'.format(full_url),} )
+            # send_user_email.delay(email,content,**email_data)
+            details = {'field':'auth','password':password,'email':school_email}
+            logger.info(f'user {school_email} has been registered')
+            return Response({'message': "School Registration successful", 'status': '00','token':user.token}, status=status.HTTP_200_OK)
+        return Response({'message': "Invalid credentials", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SchoolLoginAPIView(APIView):
+    """
+    Logs in an existing school user.
+    """
+    permission_classes = [AllowAny]
+    serializer_class = SchoolLoginSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        school_email = request.data.get('school_email')
+        password = request.data.get('password')
+
+        if serializer.is_valid(raise_exception=True):
+            user = authenticate(email=school_email, password=password) 
+            if user is None:
+                users = School.objects.all()
+                return Response ({'Invalid email or password'}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                if not user.is_active:
+                    raise serializers.ValidationError(
+                        'This user has been deactivated.'
+                    )
+                else:
+                    logger.info('login successful for {}'.format(school_email))
+
+            resp ={
+                    'status':'00',
+                    'token':user.token,
+
+                    'message':'user loggedin successfully'
+                }
+            return Response(resp, status=status.HTTP_200_OK)
+                
+        return Response({'message': "Invalid credentials", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
+
+
 
