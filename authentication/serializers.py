@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 
-from .models import User
+from .models import User,School
 
 
 logger = logging.getLogger(__name__)
@@ -74,6 +74,80 @@ class RegistrationSerializer(serializers.Serializer):
 
 
 class LoginSerializer(serializers.Serializer):
+    password = serializers.CharField(max_length=128, write_only=True)
+    # Ignore these fields if they are included in the request.
+    username = serializers.CharField(max_length=255, read_only=True)
+    token = serializers.CharField(max_length=255, read_only=True)
+
+    def validate_phone_no(self, valuUsere):
+        if not value:
+            raise serializers.ValidationError(
+                'An phone_no is required to log in.'
+            )
+        return value 
+    def validate_password(self, value):
+        if value is None:
+            raise serializers.ValidationError(
+                'A password is required to log in.'
+            )
+        return value
+
+
+
+class SchoolRegistrationSerializer(serializers.Serializer):
+    """Serializer registration requests and create a new user."""
+
+    password = serializers.CharField(
+        max_length=128,
+        min_length=6,
+        write_only=True,
+        error_messages={
+            "min_length": "Password should be at least {min_length} characters"
+        }
+    )
+    confirmed_password = serializers.CharField(
+        max_length=128,
+        min_length=6,
+        write_only=True,
+        error_messages={
+            "min_length": "Password should be at least {min_length} characters"
+        }
+    )
+
+    class Meta:
+        model = School
+        fields = ["email", "school_name", "school_email","school_address","city","country",
+                  "password", "confirmed_password",]
+
+    def validate(self, data):
+        """Validate data before it gets saved."""
+
+        confirmed_password = data.get("confirmed_password")
+        try:
+            validate_password(data["password"])
+        except ValidationError as identifier:
+            raise serializers.ValidationError({
+                "password": str(identifier).replace(
+                    "["", "").replace(""]", "")})
+
+        if not self.do_passwords_match(data["password"], confirmed_password):
+            raise serializers.ValidationError({
+                "passwords": ("Passwords do not match")
+            })
+
+        return data
+
+    def create(self, validated_data):
+        """Create a user."""
+        del validated_data["confirmed_password"]
+        return User.objects.create_user(**validated_data)
+
+    def do_passwords_match(self, password1, password2):
+        """Check if passwords match."""
+        return password1 == password2
+
+
+class SchoolLoginSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=128, write_only=True)
     # Ignore these fields if they are included in the request.
     username = serializers.CharField(max_length=255, read_only=True)
