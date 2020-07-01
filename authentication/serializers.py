@@ -116,7 +116,7 @@ class SchoolRegistrationSerializer(serializers.Serializer):
 
     class Meta:
         model = School
-        fields = ["email", "school_name", "school_email","school_address","city","country",
+        fields = [ "school_email","school_name","school_address",
                   "password", "confirmed_password",]
 
     def validate(self, data):
