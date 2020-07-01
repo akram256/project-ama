@@ -74,11 +74,14 @@ class RegistrationAPIView(generics.GenericAPIView):
             # email_verification_url=reverse('Auth:verify')
             # full_url= request.build_absolute_uri(email_verification_url + '?token='+user.token)
             # email_data = {'subject':'Welcome To Africa My Africa','email_from':settings.EMAIL_FROM}
-            # content = render_to_string('activate_account.html',{'token':'{}'.format(full_url),} )
+            # content = render_to_string('activate_accountregister.html',{'token':'{}'.format(full_url),} )
             # send_user_email.delay(email,content,**email_data)
             details = {'field':'auth','password':password,'email':email}
             logger.info(f'user {email} has been registered')
-            return Response({'message': "Registration successful", 'status': '00','token':user.token}, status=status.HTTP_200_OK)
+            return Response({'message': "Registration successful", 'status': '00','token':user.token, 
+                    'first_name':user.first_name,
+                    'last_name':user.last_name,
+                    'email':user.email,}, status=status.HTTP_200_OK)
         return Response({'message': "Invalid credentials", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -110,6 +113,9 @@ class LoginAPIView(APIView):
             resp ={
                     'status':'00',
                     'token':user.token,
+                    'first_name':user.first_name,
+                    'last_name':user.last_name,
+                    'email':user.email,
 
                     'message':'user loggedin successfully'
                 }
@@ -162,7 +168,12 @@ class SchoolRegistrationAPIView(generics.GenericAPIView):
             # send_user_email.delay(email,content,**email_data)
             details = {'field':'auth','password':password,'email':school_email}
             logger.info(f'user {school_email} has been registered')
-            return Response({'message': "School Registration successful", 'status': '00','token':user.token}, status=status.HTTP_200_OK)
+            return Response({'message': "School Registration successful", 'status': '00',
+                             'token':user.token,
+                             'school_name':user.school_name,
+                             'school_address':user.school_address,
+                             'email':user.school_email,
+                             }, status=status.HTTP_200_OK)
         return Response({'message': "Invalid credentials", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -200,6 +211,3 @@ class SchoolLoginAPIView(APIView):
             return Response(resp, status=status.HTTP_200_OK)
                 
         return Response({'message': "Invalid credentials", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
-
-
-
