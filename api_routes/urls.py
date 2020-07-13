@@ -1,5 +1,6 @@
 from django.urls import path, include
-from authentication.views import LoginAPIView, RegistrationAPIView,SchoolRegistrationAPIView,SchoolLoginAPIView
+from authentication.views import LoginAPIView, RegistrationAPIView,SchoolRegistrationAPIView, AgeCategoryView
+# ,SchoolLoginAPIView
 
 app_name= 'authentication'
 urlpatterns = [
@@ -8,7 +9,9 @@ urlpatterns = [
     path("register", RegistrationAPIView.as_view(), name='register'),
     path("login",LoginAPIView.as_view(), name='login'),
     path("school/register",SchoolRegistrationAPIView.as_view(),name='school-register'),
-    path("school/login",SchoolLoginAPIView.as_view(),name='school-login')
+    path("age/category", AgeCategoryView.as_view(),name='age-category'),
+   
+    # path("school/login",SchoolLoginAPIView.as_view(),name='school-login')
 
 
 ]
