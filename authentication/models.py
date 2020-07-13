@@ -70,7 +70,6 @@ class Age_Category(BaseAbstractModel):
     """"Age category Model"""
 
     age_category=models.CharField(max_length=255, blank=True, null=True)
-    pic= models.ImageField(upload_to='age/', null=True)
 
     def __str__(self):
         return self.age_category
