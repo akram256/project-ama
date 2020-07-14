@@ -1,7 +1,7 @@
 from django.urls import path, include
 
 from books.models import LikeDislike, LikeDislikeManager,BookModel
-from books.views import ChoiceView,BookView
+from books.views import ChoiceView,BookView,BookCategoryView,RatingsView
 
 
 app_name= 'books'
@@ -19,5 +19,7 @@ urlpatterns = [
             manager=LikeDislikeManager),
         name='books_dislike'),
 
+    path('books/category',BookCategoryView.as_view(),name='books-category'),
+    path("books/<str:id>/rate/", RatingsView.as_view(), name="rating"),
 
 ]

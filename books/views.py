@@ -10,8 +10,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser, AllowAny,IsAuthenticated
 
-from .models import BookModel
-from .serializers import BookSerializer
+from .models import BookModel,BookCategoryModel
+from .serializers import BookSerializer,BookCategorySerializer, RatingSerializer
 from authentication.models import User
 from django.contrib.contenttypes.models import ContentType
 from .models import LikeDislike
@@ -61,3 +61,40 @@ class ChoiceView(ListCreateAPIView):
         serializer = BookSerializer(obj)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class BookCategoryView(ListAPIView):
+    serializer_class=BookCategorySerializer
+    permission_classes=(AllowAny,)
+    queryset=BookCategoryModel.objects.all()
+
+
+    def post(self, request):
+        post_data = {"name":request.data["name"],"cover_image":request.data["cover_image"]}
+        serializer = self.get_serializer(data=post_data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"message":"Book category  has been  successfully Input"},
+                        status=status.HTTP_201_CREATED)
+
+
+class RatingsView(ListCreateAPIView):
+    """
+    implements methods to handle rating books
+    """
+    serializer_class = RatingSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, id=None):
+        """
+        method to post a rating for an article
+        """
+        data = self.serializer_class.update_data(
+            request.data.get("book", {}), id)
+
+        serializer = self.serializer_class(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+                        
