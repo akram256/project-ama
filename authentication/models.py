@@ -49,22 +49,14 @@ class User(AbstractBaseUser, PermissionsMixin, BaseAbstractModel):
 
         return token.decode('utf-8')
 
-# class UserProfile(BaseAbstractModel):
-#     """User Profile Model"""
+class UserProfile(BaseAbstractModel):
+    """User Profile Model"""
 
-#     # AGE_CHOICES = (
-#     #     ('5-7', '5-7'),
-#     #     ('8-10', '8-10'),
-#     #      ('11-15', '11-15'),
-#     #       ('16-ABOVE', '16-ABOVE')
-#     # )
+    user = models.OneToOneField(to='User', on_delete=models.CASCADE)
+    image= models.ImageField(upload_to='profile/', null=True)
 
-#     user = models.OneToOneField(to='User', on_delete=models.CASCADE) 
-#     # age_category = models.CharField(max_length=255, choices=AGE_CHOICES)
-#     image= models.ImageField(upload_to='profile/', null=True)
-
-#     def __str__(self):
-#         return "{}".format(self.user)
+    def __str__(self):
+        return "{}".format(self.user)
 
 class Age_Category(BaseAbstractModel):
     """"Age category Model"""
