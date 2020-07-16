@@ -1,29 +1,25 @@
 import uuid
 import base64
+from decimal import Decimal
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.db.models.signals import post_save
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.fields import GenericRelation
-from utils.models import BaseAbstractModel
-from decimal import Decimal
+from django.db.models import Avg
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
+
+from utils.models import BaseAbstractModel
 from authentication.models import User
 
 
-# class BookCategoryModel(BaseAbstractModel):
-#     user = models.OneToOneField(User,
-#                                 unique=True,
-#                                 verbose_name=_('user'),
-#                                 on_delete=models.CASCADE)
-#     name = models.CharField(max_length=300, blank=True, null=True)
-#     cover_image= models.CharField(max_length=300, blank=True, null=True)
-#     book_url = models.CharField(max_length=300, blank=True, null=True)
-#     price = models.CharField(max_length=300, blank=True, null=True)
-#     author = models.CharField(max_length=300, blank=True, null=True)
-    # category = models.CharField(max_length=300, blank=True, null=True)
+class BookCategoryModel(BaseAbstractModel):
+    """Model of book categories of interest"""
+    name = models.CharField(max_length=300, blank=True, null=True)
+    cover_image= models.ImageField(upload_to='category/', null=True)
 
 
 class LikeDislikeManager(models.Manager):
@@ -54,20 +50,39 @@ class LikeDislike(BaseAbstractModel):
 
 
 class BookModel(BaseAbstractModel):
-    user = models.OneToOneField(User,
-                                unique=True,
-                                verbose_name=_('user'),
-                                on_delete=models.CASCADE)
+    """
+        Model for books
+    """
     name = models.CharField(max_length=300, blank=True, null=True)
-    cover_image= models.CharField(max_length=300, blank=True, null=True)
+    cover_image=  models.ImageField(upload_to='books/', null=True)
     book_url = models.CharField(max_length=300, blank=True, null=True)
-    price = models.CharField(max_length=300, blank=True, null=True)
+    price = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
     author = models.CharField(max_length=300, blank=True, null=True)
-    votes = GenericRelation(LikeDislike, related_name='articles')
+    votes = GenericRelation(LikeDislike, related_name='books')
+    user_rates = models.CharField(max_length=10, default=0)
     # category = models.CharField(max_length=300, blank=True, null=True)
 
     def __str__(self):
         return self.name
     
+    @property
+    def average_rating(self):
+        """
+        method to calculate the average rating of the article.
+        """
+        ratings = self.scores.all().aggregate(score=Avg("score"))
+        return float('%.2f' % (ratings["score"] if ratings['score'] else 0))
 
+
+class Rating(models.Model):
+    """
+        Model for rating an book
+    """
+    book = models.ForeignKey(BookModel, related_name="scores",
+                                on_delete=models.CASCADE)
+    rated_on = models.DateTimeField(auto_now_add=True)
+    score = models.DecimalField(max_digits=5, decimal_places=2)
+
+    class Meta:
+        ordering = ["-score"]
 
