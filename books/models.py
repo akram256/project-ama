@@ -56,7 +56,7 @@ class BookModel(BaseAbstractModel):
     name = models.CharField(max_length=300, blank=True, null=True)
     cover_image=  models.ImageField(upload_to='books/', null=True)
     book_url = models.CharField(max_length=300, blank=True, null=True)
-    price = models.DecimalField(max_digits=12, decimal_places=2, null=True, default=Decimal('0.00'))
+    price = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
     author = models.CharField(max_length=300, blank=True, null=True)
     votes = GenericRelation(LikeDislike, related_name='books')
     user_rates = models.CharField(max_length=10, default=0)
