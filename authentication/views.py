@@ -10,6 +10,7 @@ from decimal import Decimal
 
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.cache import cache
+from django.template.loader import render_to_string
 from django.http import HttpResponseRedirect
 from django.core.cache import cache
 from django.conf import settings
@@ -34,6 +35,7 @@ from .serializers import RegistrationSerializer,LoginSerializer,AgeSerializer,Up
 from authentication.models import User,Age_Category,UserProfile
 # , School
 from utils import services
+from utils.tasks import send_user_email
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +72,7 @@ class RegistrationAPIView(generics.GenericAPIView):
         else:
             return Response({'message':'Email: {} is not valid'.format(email),}, status=status.HTTP_400_BAD_REQUEST)
         if serializer.is_valid(raise_exception=True):
-            user=User(email=email,password=password,first_name=first_name,last_name=last_name,is_active=True,role='USER')
+            user=User(email=email,password=password,first_name=first_name,last_name=last_name,role='USER')
             user.set_password(password)
             user.save()
             UserProfile.objects.create(user=user)
@@ -79,9 +81,15 @@ class RegistrationAPIView(generics.GenericAPIView):
             # email_data = {'subject':'Welcome To Africa My Africa','email_from':settings.EMAIL_FROM}
             # content = render_to_string('activate_accountregister.html',{'token':'{}'.format(full_url),} )
             # send_user_email.delay(email,content,**email_data)
+            email_verification_url=reverse('authentication:verify')
+            full_url= request.build_absolute_uri(email_verification_url + '?token='+user.token)
+            email_data = {'subject':'Welcome To Africa My Africa','email_from':settings.EMAIL_FROM}
+            content = render_to_string('activate_account.html',{'token':'{}'.format(full_url),} )
+            send_user_email.delay(email,content,**email_data)
+
             details = {'field':'auth','password':password,'email':email}
             logger.info(f'user {email} has been registered')
-            return Response({'message': "Registration successful", 'status': '00','token':user.token, 
+            return Response({'message': "Registration successful, Kindly Check your email for complete the registration", 'status': '00','token':user.token, 
                     'user_id':user.id,
                     'first_name':user.first_name,
                     'last_name':user.last_name,
@@ -89,6 +97,20 @@ class RegistrationAPIView(generics.GenericAPIView):
         return Response({'message': "Invalid credentials", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class VerifyAccount(APIView):
+    permission_classes = (AllowAny, )
+    def get(self,request,format=None):
+        token = request.GET['token']
+        payload = jwt.decode(token, settings.SECRET_KEY, 'utf-8')
+        id = payload['id']
+        user = User.objects.filter(id=id)
+        user.update(is_active=True)
+        return Response(
+            {
+                'message': 'Account successfully verified,'
+                'your free to  now login'
+            },
+            status=status.HTTP_200_OK)
 
 class SchoolRegistrationAPIView(generics.GenericAPIView):
 

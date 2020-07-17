@@ -186,3 +186,14 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
 }
+
+EMAIL_FROM =os.environ.get('EMAIL_FROM')
+EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', '')
+EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+EMAIL_PORT = os.environ.get('EMAIL_PORT', '')
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', '')
+EMAIL_SWITCH = os.environ.get('EMAIL_SWITCH', '')
+CACHE_TIME = int(os.environ.get('CACHE_TIME', '172800'))
+EMAIL_CACHE_TIME = int(os.environ.get('EMAIL_CACHE_TIME', '7200'))
