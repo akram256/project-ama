@@ -292,6 +292,29 @@ class UpdateProfileView(RetrieveUpdateDestroyAPIView):
             serializer.save()
             return Response({'message':'user profile updated','status':'00',}, status=status.HTTP_200_OK)
         return Response({'message': "Invalid credentials", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class UserProfileView(ListAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        user = User.objects.get(email=request.user.email)
+        # image=UserProfile.objects.get(user=request.user)
+        data = {'id':user.id,'first_name':user.first_name,'last_name':user.last_name,
+               'email':user.email ,
+                # 'image':image.image
+                }
+        if data['first_name'] or data['last_name']:
+            return Response({
+                    'status': '00',
+                    'user': data
+                })
+        else:
+            return Response({
+                    'status': '404',
+                    'user': data
+                })
     
     # permission_classes =(AllowAny,)
     # serializer_class = UpdateProfileSerializer
