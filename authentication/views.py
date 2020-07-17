@@ -76,11 +76,7 @@ class RegistrationAPIView(generics.GenericAPIView):
             user.set_password(password)
             user.save()
             UserProfile.objects.create(user=user)
-            # email_verification_url=reverse('Auth:verify')
-            # full_url= request.build_absolute_uri(email_verification_url + '?token='+user.token)
-            # email_data = {'subject':'Welcome To Africa My Africa','email_from':settings.EMAIL_FROM}
-            # content = render_to_string('activate_accountregister.html',{'token':'{}'.format(full_url),} )
-            # send_user_email.delay(email,content,**email_data)
+
             email_verification_url=reverse('authentication:verify')
             full_url= request.build_absolute_uri(email_verification_url + '?token='+user.token)
             email_data = {'subject':'Welcome To Africa My Africa','email_from':settings.EMAIL_FROM}
@@ -322,42 +318,19 @@ class UpdateProfileView(RetrieveUpdateDestroyAPIView):
 
 class UserProfileView(ListAPIView):
     permission_classes = (IsAuthenticated,)
-
+    serializer_class = UpdateProfileSerializer
+    
+        
     def get(self, request):
         user = User.objects.get(email=request.user.email)
-        # image=UserProfile.objects.get(user=request.user)
-        data = {'id':user.id,'first_name':user.first_name,'last_name':user.last_name,
-               'email':user.email ,
-                # 'image':image.image
-                }
-        if data['first_name'] or data['last_name']:
+        data = UserProfile.objects.filter(user=user)
+        if user:
+            serializer = self.serializer_class(data, many=True)
             return Response({
-                    'status': '00',
-                    'user': data
-                })
-        else:
-            return Response({
-                    'status': '404',
-                    'user': data
-                })
-    
-    # permission_classes =(AllowAny,)
-    # serializer_class = UpdateProfileSerializer
-    # lookup_field = 'id'
-    # queryset = UserProfile.objects.all()
-
-    # def get_object(self):
-    #     return get_object_or_404(
-    #         self.get_queryset(), id=self.kwargs.get('id'))
-
-    # def update(self, request, *args, **kwargs):
-    #     partial = kwargs.pop('partial', False)
-    #     instance = self.get_object()
-    #     serializer = self.get_serializer(instance, data=request.data,
-    #                                      partial=partial)
-    #     serializer.is_valid(raise_exception=True)
-    #     self.perform_update(serializer)
-    #     return Response({'message':'Successfully updated',
-    #         'data':serializer.data},status=status.HTTP_200_OK)
-                        
-    
+                'status': '00',
+                'data':  serializer.data,
+            })
+        return Response({
+            'status': 99,
+            'message': 'Unauthenticated!'
+        }, status=status.HTTP_200_OK)
