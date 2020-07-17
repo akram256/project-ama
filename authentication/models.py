@@ -53,7 +53,7 @@ class UserProfile(BaseAbstractModel):
     """User Profile Model"""
 
     user = models.OneToOneField(to='User', on_delete=models.CASCADE)
-    image= models.ImageField(upload_to='profile/', null=True)
+    image=  models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return "{}".format(self.user)
