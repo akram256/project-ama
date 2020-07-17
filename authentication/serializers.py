@@ -7,11 +7,24 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 
-from .models import User,Age_Category
+from .models import User,Age_Category,UserProfile
 # School,UserProfile,
 
 
+
+
 logger = logging.getLogger(__name__)
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=User
+        fields=('id','first_name','last_name','email')
+    
+def swap(value,new):
+    if value :
+        return value
+    else:
+        return new
 
 
 class RegistrationSerializer(serializers.Serializer):
@@ -95,4 +108,25 @@ class AgeSerializer(serializers.ModelSerializer):
     class Meta:
         model=Age_Category
         fields=('id','age_category')
+
+class UpdateProfileSerializer(serializers.ModelSerializer):
+    user=UserSerializer()
+
+    def update(self, instance, validated_data):
+        print(instance)
+        print(validated_data)
+        validated_data=validated_data['user']
+        logger.info(instance.user.email)
+        logger.info(validated_data)
+        instance.user.email = swap(validated_data.get('email'), instance.user.email)
+        instance.user.first_name = swap(validated_data.get('first_name'), instance.user.first_name)
+        instance.user.last_name = swap(validated_data.get('last_name'), instance.user.last_name)
+        logger.info(instance.user.email)
+        instance.user.save()
+        return instance
+
+
+    class Meta:
+        model=UserProfile
+        fields=('user','first_name','last_name','email','image')
 

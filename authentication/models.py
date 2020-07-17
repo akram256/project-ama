@@ -58,6 +58,18 @@ class UserProfile(BaseAbstractModel):
     def __str__(self):
         return "{}".format(self.user)
 
+    @property
+    def first_name(self):
+        return self.user.first_name
+
+    @property
+    def last_name(self):
+        return self.user.first_name
+    
+    @property
+    def email(self):
+        return self.user.email
+
 class Age_Category(BaseAbstractModel):
     """"Age category Model"""
 

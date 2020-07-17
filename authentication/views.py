@@ -29,9 +29,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import ListAPIView,RetrieveUpdateDestroyAPIView,ListCreateAPIView,RetrieveUpdateAPIView
 from rest_framework.views import APIView
 
-from .serializers import RegistrationSerializer,LoginSerializer,AgeSerializer
+from .serializers import RegistrationSerializer,LoginSerializer,AgeSerializer,UpdateProfileSerializer
 # ,SchoolRegistrationSerializer,SchoolLoginSerializer
-from authentication.models import User,Age_Category
+from authentication.models import User,Age_Category,UserProfile
 # , School
 from utils import services
 
@@ -73,6 +73,7 @@ class RegistrationAPIView(generics.GenericAPIView):
             user=User(email=email,password=password,first_name=first_name,last_name=last_name,is_active=True,role='USER')
             user.set_password(password)
             user.save()
+            UserProfile.objects.create(user=user)
             # email_verification_url=reverse('Auth:verify')
             # full_url= request.build_absolute_uri(email_verification_url + '?token='+user.token)
             # email_data = {'subject':'Welcome To Africa My Africa','email_from':settings.EMAIL_FROM}
@@ -103,7 +104,6 @@ class SchoolRegistrationAPIView(generics.GenericAPIView):
         school_name=request.data.get('school_name')
         school_address=request.data.get('school_address')
         email= str(email)
-        print(email)
         email = email.lower()
         email_pattern = services.EMAIL_PATTERN
         password_pattern = services.PASSWORD_PATTERN
@@ -124,7 +124,10 @@ class SchoolRegistrationAPIView(generics.GenericAPIView):
             user=User(email=email,password=password,school_name=school_name,school_address=school_address,is_active=True,role='SCHOOL')
             user.set_password(password)
             user.save()
-            print(user,'hewre we are')
+           
+            UserProfile.objects.create(user=user)
+            # userx= UserProfile.objects.create(user=user)
+            # print(userx,'hewre we are')
             # email_verification_url=reverse('Auth:verify')
             # full_url= request.build_absolute_uri(email_verification_url + '?token='+user.token)
             # email_data = {'subject':'Welcome To Africa My Africa','email_from':settings.EMAIL_FROM}
@@ -232,5 +235,81 @@ class AgeCategoryView(ListAPIView):
         serializer.save()
         return Response({"message":"Age category  has been  successfully Input"},
                         status=status.HTTP_201_CREATED)
+
+
+class UpdateProfileView(RetrieveUpdateDestroyAPIView):
+
+    permission_classes = (IsAuthenticated,)
+    serializer_class = UpdateProfileSerializer
+    lookup_field = 'id'
+
+    def get_object(self,id):        
+        try:
+            user = User.objects.get(id=id)
+            return UserProfile.objects.get(user=user),user
+        except Exception as e:
+            print(e)
+            return None, None
+
+    def put(self, request,id):
+        if not id:
+            return Response({'message':'network error please try again', 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            userprofile = self.get_object(id)[0]
+            user = self.get_object(id)[1]
+        
+        if not userprofile:
+            return Response({'message':'user does not exist', 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
+        users = User.objects.all()
+        rdata = request.data
+
+        first_name = request.data['user']['first_name']
+        last_name=request.data['user']['first_name']
+        email = request.data['user']['email']
+        image=request.data['user']['image']
+      
+        email=email.lower()
+        email_pattern = services.EMAIL_PATTERN
+
+        if email and (email != request.user.email):
+            if re.match(email_pattern,email):
+                userx = [i for i in users if i.email == email]
+                if userx:
+                    return Response({'message':'This email: {} , already belongs to a user on lottoly'.format(email),}, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    rdata['user']['email'] = email
+            else:
+                return Response({'message':'Email: {} is not valid'.format(email),}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            rdata['user']['email'] = ''
+      
+        serializer = self.serializer_class(userprofile,data=rdata)
+        logger.info(rdata)
+        print(rdata)
+        logger.info(serializer.is_valid())
+        print((serializer.is_valid()))
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response({'message':'user profile updated','status':'00',}, status=status.HTTP_200_OK)
+        return Response({'message': "Invalid credentials", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    # permission_classes =(AllowAny,)
+    # serializer_class = UpdateProfileSerializer
+    # lookup_field = 'id'
+    # queryset = UserProfile.objects.all()
+
+    # def get_object(self):
+    #     return get_object_or_404(
+    #         self.get_queryset(), id=self.kwargs.get('id'))
+
+    # def update(self, request, *args, **kwargs):
+    #     partial = kwargs.pop('partial', False)
+    #     instance = self.get_object()
+    #     serializer = self.get_serializer(instance, data=request.data,
+    #                                      partial=partial)
+    #     serializer.is_valid(raise_exception=True)
+    #     self.perform_update(serializer)
+    #     return Response({'message':'Successfully updated',
+    #         'data':serializer.data},status=status.HTTP_200_OK)
                         
     

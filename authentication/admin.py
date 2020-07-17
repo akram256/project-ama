@@ -1,10 +1,12 @@
-from django.contrib import admin
-from .models import User,Age_Category
-# School
-from django.contrib.auth.admin import UserAdmin
-from django.http import HttpResponse
 import csv
 from datetime import datetime
+
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+from django.http import HttpResponse
+
+
+from .models import User,Age_Category,UserProfile
 # from rangefilter.filter import DateRangeFilter
 
 class ExportCsvMixin:
@@ -46,6 +48,7 @@ class CustomUserAdmin(UserAdmin, ExportCsvMixin):
 
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Age_Category)
+admin.site.register(UserProfile)
 
 
 # @admin.register(School)
