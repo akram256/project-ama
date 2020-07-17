@@ -316,21 +316,37 @@ class UpdateProfileView(RetrieveUpdateDestroyAPIView):
 
 
 
-class UserProfileView(ListAPIView):
+class UserProfileView(RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = UpdateProfileSerializer
+    lookup_field='id'
+    queryset=UserProfile.objects.all()
+
+    def get_object(self):
+        return get_object_or_404(
+            self.get_queryset(), id=self.kwargs.get('id'))
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data,
+                                         partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response({'message':'Successfully updated',
+            'data':serializer.data},status=status.HTTP_200_OK)
     
         
-    def get(self, request):
-        user = User.objects.get(email=request.user.email)
-        data = UserProfile.objects.filter(user=user)
-        if user:
-            serializer = self.serializer_class(data, many=True)
-            return Response({
-                'status': '00',
-                'data':  serializer.data,
-            })
-        return Response({
-            'status': 99,
-            'message': 'Unauthenticated!'
-        }, status=status.HTTP_200_OK)
+    # def get(self, request):
+    #     user = User.objects.get(email=request.user.email)
+    #     data = UserProfile.objects.filter(user=user)
+    #     if user:
+    #         serializer = self.serializer_class(data, many=True)
+    #         return Response({
+    #             'status': '00',
+    #             'data':  serializer.data,
+    #         })
+    #     return Response({
+    #         'status': 99,
+    #         'message': 'Unauthenticated!'
+    #     }, status=status.HTTP_200_OK)
