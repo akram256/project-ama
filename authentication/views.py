@@ -82,6 +82,7 @@ class RegistrationAPIView(generics.GenericAPIView):
             details = {'field':'auth','password':password,'email':email}
             logger.info(f'user {email} has been registered')
             return Response({'message': "Registration successful", 'status': '00','token':user.token, 
+                    'user_id':user.id,
                     'first_name':user.first_name,
                     'last_name':user.last_name,
                     'email':user.email,}, status=status.HTTP_200_OK)
@@ -136,6 +137,7 @@ class SchoolRegistrationAPIView(generics.GenericAPIView):
             details = {'field':'auth','password':password,'email':email}
             logger.info(f'user {email} has been registered')
             return Response({'message': "School Registration successful", 'status': '00',
+                            'user_id':user.id, 
                              'token':user.token,
                             #  'school_name':school.school_name,
                             #  'school_address':school.school_address,
@@ -172,6 +174,7 @@ class LoginAPIView(APIView):
 
             resp ={
                     'status':'00',
+                    'id':user.id,
                     'token':user.token,
                     'first_name':user.first_name,
                     'last_name':user.last_name,
