@@ -88,7 +88,7 @@ class RatingSerializer(serializers.ModelSerializer):
         class behaviours
         """
         model = Rating
-        fields = ("score", "rated_on", "book", "created_at")
+        fields = ("score", "rated_on", "book")
 
 
 class BookmarkSerializer(serializers.ModelSerializer):
