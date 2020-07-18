@@ -290,7 +290,10 @@ class UpdateProfileView(RetrieveUpdateDestroyAPIView):
         first_name = request.data['user']['first_name']
         last_name=request.data['user']['first_name']
         email = request.data['user']['email']
-        image=request.data['user']['image']
+        try:
+            image=request.data['user']['image']
+        except:
+            image=None
       
         email=email.lower()
         email_pattern = services.EMAIL_PATTERN
