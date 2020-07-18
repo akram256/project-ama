@@ -75,8 +75,8 @@ class RegistrationAPIView(generics.GenericAPIView):
             user=User(email=email,password=password,first_name=first_name,last_name=last_name,is_active=True,role='USER')
             user.set_password(password)
             user.save()
-            UserProfile.objects.create(user=user)
-
+            UserProfile.objects.create(user=user) 
+            profile= UserProfile.objects.get(user=user)   
             email_verification_url=reverse('authentication:verify')
             full_url= request.build_absolute_uri(email_verification_url + '?token='+user.token)
             email_data = {'subject':'Welcome To Africa My Africa','email_from':settings.EMAIL_FROM}
@@ -88,6 +88,7 @@ class RegistrationAPIView(generics.GenericAPIView):
             return Response({'message': "Registration successful", 'status': '00','token':user.token, 
             # Kindly Check your email for complete the registration
                     'user_id':user.id,
+                    'profile_id':profile.id,
                     'first_name':user.first_name,
                     'last_name':user.last_name,
                     'email':user.email,}, status=status.HTTP_200_OK)
@@ -190,10 +191,11 @@ class LoginAPIView(APIView):
                     )
                 else:
                     logger.info('login successful for {}'.format(email))
-
+            profile= UserProfile.objects.get(user=user) 
             resp ={
                     'status':'00',
                     'id':user.id,
+                    'profile_id':profile.id,
                     'token':user.token,
                     'first_name':user.first_name,
                     'last_name':user.last_name,
