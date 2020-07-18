@@ -86,3 +86,9 @@ class Rating(models.Model):
     class Meta:
         ordering = ["-score"]
 
+class Bookmark(BaseAbstractModel):
+    """
+        Model for bookmarking
+    """
+    user = models.ForeignKey(User, blank=False, on_delete=models.CASCADE)
+    book = models.ForeignKey(BookModel, blank=False, on_delete=models.CASCADE)

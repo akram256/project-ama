@@ -5,13 +5,13 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 
 from rest_framework import viewsets
-from rest_framework.generics import ListCreateAPIView,ListAPIView,RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListCreateAPIView,ListAPIView,DestroyAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser, AllowAny,IsAuthenticated
 
-from .models import BookModel,BookCategoryModel
-from .serializers import BookSerializer,BookCategorySerializer, RatingSerializer
+from .models import BookModel,BookCategoryModel,Bookmark
+from .serializers import BookSerializer,BookCategorySerializer, RatingSerializer,BookmarkSerializer
 from authentication.models import User
 from django.contrib.contenttypes.models import ContentType
 from .models import LikeDislike
@@ -96,5 +96,56 @@ class RatingsView(ListCreateAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class BookmarkView(ListCreateAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = BookmarkSerializer
+    queryset = Bookmark.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        book = get_object_or_404(BookModel, id=self.kwargs.get('id'))
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        instance = Bookmark.objects.filter(
+            id=book.id, user=request.user.id)
+        if instance:
+            return Response({"message": "article already bookmarked"},
+                            status=status.HTTP_200_OK)
+
+        self.perform_create(serializer,book)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def perform_create(self, serializer, book):
+        serializer.save(user=self.request.user, book=book)
+
+
+class UnBookmarkView(DestroyAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = BookmarkSerializer
+    lookup_field = 'id'
+    queryset = Bookmark.objects.all()
+
+    def destroy(self, request, *args, **kwargs):
+        instance = Bookmark.objects.filter(
+            user_id=request.user.id, id=self.kwargs['id'])
+        if not instance:
+            return Response({"message": "bookmark not found"},
+                            status=status.HTTP_404_NOT_FOUND)
+        self.perform_destroy(instance)
+        return Response({"message": "Book successfully unbookmarked"},
+                        status=status.HTTP_200_OK)
+
+
+class ListBookmarksView(ListAPIView):
+    serializer_class = BookmarkSerializer
+    permission_classes = (IsAuthenticated,)
+    queryset = Bookmark.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        bookmarks = self.queryset.filter(
+            user_id=request.user)
+        serializer = self.serializer_class(bookmarks, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
                         

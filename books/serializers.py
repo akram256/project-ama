@@ -1,6 +1,6 @@
 import logging
 from rest_framework import serializers
-from .models import BookModel,BookCategoryModel,Rating
+from .models import BookModel,BookCategoryModel,Rating, Bookmark
 
 
 logger = logging.getLogger(__name__)
@@ -88,4 +88,19 @@ class RatingSerializer(serializers.ModelSerializer):
         class behaviours
         """
         model = Rating
-        fields = ("score", "rated_on", "book")
+        fields = ("score", "rated_on", "book", "created_at")
+
+
+class BookmarkSerializer(serializers.ModelSerializer):
+    Reader = serializers.ReadOnlyField(source='user.email')
+    # user = serializers.ReadOnlyField(source='user')
+    first_name = serializers.ReadOnlyField(source='user.first_name')
+
+    book_name = serializers.ReadOnlyField(source='book.name')
+    book_url = serializers.ReadOnlyField(source='book.book_url')
+    price = serializers.ReadOnlyField(source='book.price')
+    rating = serializers.ReadOnlyField(source='book.average_rating')
+    # likes = serializers.ReadOnlyField(source='book.votes.likes')
+    class Meta:
+        model = Bookmark
+        fields = ('Reader','first_name','book_name','book_url','price','rating')
