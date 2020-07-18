@@ -72,7 +72,7 @@ class RegistrationAPIView(generics.GenericAPIView):
         else:
             return Response({'message':'Email: {} is not valid'.format(email),}, status=status.HTTP_400_BAD_REQUEST)
         if serializer.is_valid(raise_exception=True):
-            user=User(email=email,password=password,first_name=first_name,last_name=last_name,role='USER')
+            user=User(email=email,password=password,first_name=first_name,last_name=last_name,is_active=True,role='USER')
             user.set_password(password)
             user.save()
             UserProfile.objects.create(user=user)
@@ -85,7 +85,8 @@ class RegistrationAPIView(generics.GenericAPIView):
 
             details = {'field':'auth','password':password,'email':email}
             logger.info(f'user {email} has been registered')
-            return Response({'message': "Registration successful, Kindly Check your email for complete the registration", 'status': '00','token':user.token, 
+            return Response({'message': "Registration successful", 'status': '00','token':user.token, 
+            # Kindly Check your email for complete the registration
                     'user_id':user.id,
                     'first_name':user.first_name,
                     'last_name':user.last_name,
