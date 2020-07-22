@@ -296,33 +296,6 @@ class UserProfileView(RetrieveUpdateDestroyAPIView):
         return get_object_or_404(
             self.get_queryset(), id=self.kwargs.get('id'))
 
-
-
-
-class PaystackInfo(APIView):
-    permission_classes = (IsAuthenticated,)
-    url = services.PAYSTACK_URL_BANK['transferrecipient']
-    def get(self, request,):
-        try:
-            resp_code , resp_data = services.PaystacK.get_data(self.url)
-            return Response({'message':'Success','paystack_data':resp_data}, status=status.HTTP_200_OK)
-        except:
-            return Response({'message':'error','paystack_data':resp_data}, status=status.HTTP_400_BAD_REQUEST)
-    
-    def post(self,request):
-        recipient_code = request.data.get('recipient_code')
-        url = self.url + '/' + recipient_code
-        if recipient_code:
-            resp_code , resp_data = services.PaystacK.delete_data(url)
-            if resp_code in [200,201]:
-                BankDetail.objects.filter(recipient_code=recipient_code).delete()
-                return Response({'message':'Success','paystack_data':resp_data}, status=status.HTTP_200_OK)
-            else:
-                return Response({'message':'error','paystack_data':resp_data}, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
 class AddSubscription(APIView):
     permission_classes = (IsAuthenticated,)
     def post(self, request):
