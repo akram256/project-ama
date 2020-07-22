@@ -186,7 +186,9 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
 }
-
+PAYSTACK_SECRET_KEY = os.environ.get('PAYSTACK_SECRET_KEY', '')
+PAYSTACK_PUBLIC_KEY = os.environ.get('PAYSTACK_PUBLIC_KEY', '')
+CUSTOMER_SERVICE_EMAIL = os.environ.get('CUSTOMER_SERVICE_EMAIL', '')
 EMAIL_FROM =os.environ.get('EMAIL_FROM')
 EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', '')
 EMAIL_HOST = os.environ.get('EMAIL_HOST', '')

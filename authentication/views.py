@@ -30,11 +30,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import ListAPIView,RetrieveUpdateDestroyAPIView,ListCreateAPIView,RetrieveUpdateAPIView
 from rest_framework.views import APIView
 
-from .serializers import RegistrationSerializer,LoginSerializer,AgeSerializer,UpdateProfileSerializer
+from .serializers import RegistrationSerializer,LoginSerializer,AgeSerializer,UpdateProfileSerializer,SubcriptionSerializer,VerifySubscriptionSerializer
 # ,SchoolRegistrationSerializer,SchoolLoginSerializer
 from authentication.models import User,Age_Category,UserProfile
 # , School
 from utils import services
+from utils.subscription import PaystackPayment
 from utils.tasks import send_user_email
 
 logger = logging.getLogger(__name__)
@@ -111,59 +112,60 @@ class VerifyAccount(APIView):
             status=status.HTTP_200_OK)
 
 class SchoolRegistrationAPIView(generics.GenericAPIView):
+    pass
 
-    """Register new school users."""
+#     """Register new school users."""
 
-    serializer_class = RegistrationSerializer
-    permission_class = (AllowAny,)
+#     serializer_class = RegistrationSerializer
+#     permission_class = (AllowAny,)
 
-    def post(self, request):
-        school_users = User.objects.all()
-        serializer = self.serializer_class(data=request.data)
-        password = request.data.get('password')
-        email = request.data.get('email')
-        school_name=request.data.get('school_name')
-        school_address=request.data.get('school_address')
-        email= str(email)
-        email = email.lower()
-        email_pattern = services.EMAIL_PATTERN
-        password_pattern = services.PASSWORD_PATTERN
-        url_param = get_current_site(request).domain
+#     def post(self, request):
+#         school_users = User.objects.all()
+#         serializer = self.serializer_class(data=request.data)
+#         password = request.data.get('password')
+#         email = request.data.get('email')
+#         school_name=request.data.get('school_name')
+#         school_address=request.data.get('school_address')
+#         email= str(email)
+#         email = email.lower()
+#         email_pattern = services.EMAIL_PATTERN
+#         password_pattern = services.PASSWORD_PATTERN
+#         url_param = get_current_site(request).domain
 
-        if not re.match(password_pattern,password):
-            return Response({'message':'Password is weak, please use atleast 1 UPPERCASE, 1 LOWERCASE, 1 SYMBOL',}, status=status.HTTP_400_BAD_REQUEST)
+#         if not re.match(password_pattern,password):
+#             return Response({'message':'Password is weak, please use atleast 1 UPPERCASE, 1 LOWERCASE, 1 SYMBOL',}, status=status.HTTP_400_BAD_REQUEST)
         
-        if re.match(email_pattern,email):
-            user = [i for i in school_users if i.email == email]
-            if user:
-                return Response({'message':'This email: {} , already belongs to a user on ama'.format(email),}, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                logger.info('email looks good')
-        else:
-            return Response({'message':'Email: {} is not valid'.format(email),}, status=status.HTTP_400_BAD_REQUEST)
-        if serializer.is_valid(raise_exception=True):
-            user=User(email=email,password=password,school_name=school_name,school_address=school_address,is_active=True,role='SCHOOL')
-            user.set_password(password)
-            user.save()
+#         if re.match(email_pattern,email):
+#             user = [i for i in school_users if i.email == email]
+#             if user:
+#                 return Response({'message':'This email: {} , already belongs to a user on ama'.format(email),}, status=status.HTTP_400_BAD_REQUEST)
+#             else:
+#                 logger.info('email looks good')
+#         else:
+#             return Response({'message':'Email: {} is not valid'.format(email),}, status=status.HTTP_400_BAD_REQUEST)
+#         if serializer.is_valid(raise_exception=True):
+#             user=User(email=email,password=password,school_name=school_name,school_address=school_address,is_active=True,role='SCHOOL')
+#             user.set_password(password)
+#             user.save()
            
-            UserProfile.objects.create(user=user)
-            # userx= UserProfile.objects.create(user=user)
-            # print(userx,'hewre we are')
-            # email_verification_url=reverse('Auth:verify')
-            # full_url= request.build_absolute_uri(email_verification_url + '?token='+user.token)
-            # email_data = {'subject':'Welcome To Africa My Africa','email_from':settings.EMAIL_FROM}
-            # content = render_to_string('activate_account.html',{'token':'{}'.format(full_url),} )
-            # send_user_email.delay(email,content,**email_data)
-            details = {'field':'auth','password':password,'email':email}
-            logger.info(f'user {email} has been registered')
-            return Response({'message': "School Registration successful", 'status': '00',
-                            'user_id':user.id, 
-                             'token':user.token,
-                            #  'school_name':school.school_name,
-                            #  'school_address':school.school_address,
-                            #  'email':school.school_email,
-                             }, status=status.HTTP_200_OK)
-        return Response({'message': "Invalid credentials", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
+#             UserProfile.objects.create(user=user)
+#             # userx= UserProfile.objects.create(user=user)
+#             # print(userx,'hewre we are')
+#             # email_verification_url=reverse('Auth:verify')
+#             # full_url= request.build_absolute_uri(email_verification_url + '?token='+user.token)
+#             # email_data = {'subject':'Welcome To Africa My Africa','email_from':settings.EMAIL_FROM}
+#             # content = render_to_string('activate_account.html',{'token':'{}'.format(full_url),} )
+#             # send_user_email.delay(email,content,**email_data)
+#             details = {'field':'auth','password':password,'email':email}
+#             logger.info(f'user {email} has been registered')
+#             return Response({'message': "School Registration successful", 'status': '00',
+#                             'user_id':user.id, 
+#                              'token':user.token,
+#                             #  'school_name':school.school_name,
+#                             #  'school_address':school.school_address,
+#                             #  'email':school.school_email,
+#                              }, status=status.HTTP_200_OK)
+#         return Response({'message': "Invalid credentials", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -206,44 +208,6 @@ class LoginAPIView(APIView):
             return Response(resp, status=status.HTTP_200_OK)
                 
         return Response({'message': "Invalid credentials", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
-
-
-# class SchoolLoginAPIView(APIView):
-#     """
-#     Logs in an existing school user.
-#     """
-#     permission_classes = [AllowAny]
-#     serializer_class = LoginSerializer
-
-#     def post(self, request):
-#         serializer = self.serializer_class(data=request.data)
-#         email = request.data.get('email')
-#         password = request.data.get('password')
-
-#         if serializer.is_valid(raise_exception=True):
-           
-#             user= authenticate(email=email,password=password)
-
-#             if user is None:
-#                 users = User.objects.all()
-#                 return Response ({'Invalid email or password'}, status=status.HTTP_400_BAD_REQUEST)
-#             else:
-#                 if not user.is_active:
-#                     raise serializers.ValidationError(
-#                         'This user has been deactivated.'
-#                     )
-#                 else:
-#                     logger.info('login successful for {}'.format(email))
-
-#             resp ={
-#                     'status':'00',
-#                     'token':user.token,
-
-#                     'message':'user loggedin successfully'
-#                 }
-#             return Response(resp, status=status.HTTP_200_OK)
-                
-#         return Response({'message': "Invalid credentials", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AgeCategoryView(ListAPIView):
@@ -331,3 +295,68 @@ class UserProfileView(RetrieveUpdateDestroyAPIView):
     def get_object(self):
         return get_object_or_404(
             self.get_queryset(), id=self.kwargs.get('id'))
+
+
+
+
+class PaystackInfo(APIView):
+    permission_classes = (IsAuthenticated,)
+    url = services.PAYSTACK_URL_BANK['transferrecipient']
+    def get(self, request,):
+        try:
+            resp_code , resp_data = services.PaystacK.get_data(self.url)
+            return Response({'message':'Success','paystack_data':resp_data}, status=status.HTTP_200_OK)
+        except:
+            return Response({'message':'error','paystack_data':resp_data}, status=status.HTTP_400_BAD_REQUEST)
+    
+    def post(self,request):
+        recipient_code = request.data.get('recipient_code')
+        url = self.url + '/' + recipient_code
+        if recipient_code:
+            resp_code , resp_data = services.PaystacK.delete_data(url)
+            if resp_code in [200,201]:
+                BankDetail.objects.filter(recipient_code=recipient_code).delete()
+                return Response({'message':'Success','paystack_data':resp_data}, status=status.HTTP_200_OK)
+            else:
+                return Response({'message':'error','paystack_data':resp_data}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+class AddSubscription(APIView):
+    permission_classes = (IsAuthenticated,)
+    def post(self, request):
+        serializer = SubcriptionSerializer(data=request.data)
+        if serializer.is_valid():
+            resp = PaystackPayment.make_payment(amount=request.data.get('amount'),email=request.data.get('email'))
+            print(request.data.get('email'))
+            print(resp)
+            status = resp.get('status')
+            print(status)
+            checkout_url = resp.get("data").get("authorization_url")
+            message = (resp.get('message'))
+            if status:
+                return Response({'checmake_paymentkout_url':checkout_url})
+        return Response({'error':message}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class VerifySubscriptionView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = VerifySubscriptionSerializer(data=request.data)
+        if serializer.is_valid():
+            resp = PaystackPayment.verify_payment(reference=request.data.get('reference'))
+            print(resp)
+            status = resp.get('status')
+            message = resp.get('message')
+            amount = resp.get("data").get("amount")
+            reference = resp.get("data").get("reference")
+            customer_code = resp.get("data").get("customer").get("customer_code")
+            transaction_date = resp.get("data").get("transaction_date")
+            if status:
+                return Response({"message":"Payment Successful"})
+        return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+
+
+

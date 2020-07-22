@@ -51,4 +51,38 @@ def send_Email(email, message,**kwargs):
 
 
 
+PAYSTACK_URL_BANK = {'transferrecipient':'https://api.paystack.co/transferrecipient',
+                    'transfercash':'https://api.paystack.co/transfer',
+                    'balance':'https://api.paystack.co/balance',
+                    'account_lookup':'https://api.paystack.co/bank/resolve',
+                    }
+class PaystacK:
+    api_token = settings.PAYSTACK_SECRET_KEY
+    headers = {'Content-Type': 'application/json',
+           'Authorization': 'Bearer {0}'.format(api_token)}
+
+    @classmethod
+    def post_data(cls,api_url,**data):
+        response = requests.post(api_url,json=data, headers=cls.headers)
+        data = json.loads(response.content.decode('utf-8'))
+        code = response.status_code
+        return code, data
+    @classmethod
+    def get_data(cls,api_url,**data_feed):
+        if not data_feed:
+            response = requests.get(api_url,headers=cls.headers)
+        else:
+            response = requests.get(api_url,params=data_feed,headers=cls.headers)
+        data = json.loads(response.content.decode('utf-8'))
+        code = response.status_code
+        return code, data
+    @classmethod
+    def delete_data(cls,api_url):
+        response = requests.delete(api_url,headers=cls.headers)
+        data = json.loads(response.content.decode('utf-8'))
+        code = response.status_code
+        return code, data
+
+
+
 
