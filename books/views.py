@@ -109,9 +109,9 @@ class BookmarkView(ListCreateAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         instance = Bookmark.objects.filter(
-            id=book.id, user=request.user.id)
+            book=book.id, user=request.user.id)
         if instance:
-            return Response({"message": "article already bookmarked"},
+            return Response({"message": "book already bookmarked"},
                             status=status.HTTP_200_OK)
 
         self.perform_create(serializer,book)
@@ -129,9 +129,9 @@ class UnBookmarkView(DestroyAPIView):
 
     def destroy(self, request, *args, **kwargs):
         instance = Bookmark.objects.filter(
-            user_id=request.user.id, id=self.kwargs['id'])
+            user_id=request.user.id, book=self.kwargs['id'])
         if not instance:
-            return Response({"message": "bookmark not found"},
+            return Response({"message": "book not found"},
                             status=status.HTTP_404_NOT_FOUND)
         self.perform_destroy(instance)
         return Response({"message": "Book successfully unbookmarked"},
@@ -147,5 +147,5 @@ class ListBookmarksView(ListAPIView):
         bookmarks = self.queryset.filter(
             user_id=request.user)
         serializer = self.serializer_class(bookmarks, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'data':serializer.data, },status=status.HTTP_200_OK)
                         
