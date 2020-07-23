@@ -130,3 +130,10 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
         model=UserProfile
         fields=('id','user','image')
 
+class SubcriptionSerializer(serializers.Serializer):
+    amount = serializers.CharField(required=True, allow_blank=True, max_length=100)
+    email = serializers.CharField(required=True, allow_blank=True, max_length=100)
+
+class VerifySubscriptionSerializer(serializers.Serializer):
+    reference = serializers.CharField()
+

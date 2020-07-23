@@ -99,8 +99,9 @@ class BookmarkSerializer(serializers.ModelSerializer):
     book_name = serializers.ReadOnlyField(source='book.name')
     book_url = serializers.ReadOnlyField(source='book.book_url')
     price = serializers.ReadOnlyField(source='book.price')
+    book__id=serializers.ReadOnlyField(source='book.id')
     rating = serializers.ReadOnlyField(source='book.average_rating')
     # likes = serializers.ReadOnlyField(source='book.votes.likes')
     class Meta:
         model = Bookmark
-        fields = ('Reader','first_name','book_name','book_url','price','rating')
+        fields = ('Reader','first_name','book__id','book_name','book_url','price','rating')
