@@ -10,13 +10,6 @@ app = Celery('ama')
 app.config_from_object('django.conf:settings', namespace='CELERY')
 # Load task modules from all registered Django app configs.
 app.autodiscover_tasks()
-app.conf.beat_schedule = {
-    'display_time-30-seconds': {
-        'task': 'demoapp.tasks.display_time',
-        'schedule': 10.0
-    },
-}
-
 
 @app.task(bind=True)
 def debug_task(self):

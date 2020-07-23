@@ -78,11 +78,11 @@ class RegistrationAPIView(generics.GenericAPIView):
             user.save()
             UserProfile.objects.create(user=user) 
             profile= UserProfile.objects.get(user=user)   
-            email_verification_url=reverse('authentication:verify')
-            full_url= request.build_absolute_uri(email_verification_url + '?token='+user.token)
-            email_data = {'subject':'Welcome To Africa My Africa','email_from':settings.EMAIL_FROM}
-            content = render_to_string('activate_account.html',{'token':'{}'.format(full_url),} )
-            send_user_email.delay(email,content,**email_data)
+            # email_verification_url=reverse('authentication:verify')
+            # full_url= request.build_absolute_uri(email_verification_url + '?token='+user.token)
+            # email_data = {'subject':'Welcome To Africa My Africa','email_from':settings.EMAIL_FROM}
+            # content = render_to_string('activate_account.html',{'token':'{}'.format(full_url),} )
+            # send_user_email.delay(email,content,**email_data)
 
             details = {'field':'auth','password':password,'email':email}
             logger.info(f'user {email} has been registered')
