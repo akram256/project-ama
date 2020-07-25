@@ -62,6 +62,7 @@ class BookModel(BaseAbstractModel):
     user_rates = models.CharField(max_length=10, default=0)
     is_liked=models.BooleanField(default=False)
     is_rated=models.BooleanField(default=False)
+    is_bookmarked=models.BooleanField(default=False)
     # category = models.CharField(max_length=300, blank=True, null=True)
 
     def __str__(self):
