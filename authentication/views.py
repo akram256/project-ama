@@ -250,15 +250,14 @@ class UpdateProfileView(RetrieveUpdateDestroyAPIView):
             return Response({'message':'user does not exist', 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
         users = User.objects.all()
         rdata = request.data
-
         first_name = request.data['user']['first_name']
         last_name=request.data['user']['first_name']
         email = request.data['user']['email']
         try:
-            image=request.data['user']['image']
+            image=request.data['image']
         except:
             image=None
-      
+        print(image)
         email=email.lower()
         email_pattern = services.EMAIL_PATTERN
 
@@ -274,14 +273,12 @@ class UpdateProfileView(RetrieveUpdateDestroyAPIView):
         else:
             rdata['user']['email'] = ''
       
-        serializer = self.serializer_class(userprofile,data=rdata)
-        logger.info(rdata)
-        print(rdata)
-        logger.info(serializer.is_valid())
-        print((serializer.is_valid()))
+        serializer = self.serializer_class(userprofile, data=request.data)
+        # print(request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            return Response({'message':'user profile updated','status':'00',}, status=status.HTTP_200_OK)
+            # print(serializer.data)
+            return Response({'message':'user profile updated','status':'00','data':serializer.data}, status=status.HTTP_200_OK)
         return Response({'message': "Invalid credentials", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
 
 

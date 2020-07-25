@@ -24,7 +24,6 @@ class BookView(ListAPIView):
     permission_classes=(AllowAny,)
     queryset=BookModel.objects.all()
 
-
     def post(self, request):
         post_data = {"name":request.data["name"],"cover_image":request.data["cover_image"],"author":request.data["author"],"price":request.data["price"],"book_url":request.data["book_url"]}
         serializer = self.get_serializer(data=post_data)
@@ -44,22 +43,30 @@ class ChoiceView(ListCreateAPIView):
 
     def post(self, request, id):
         obj = self.model.objects.get(id=id)
+
+        # is_liked=obj.is_liked
         try:
+            
             likedislike = LikeDislike.objects.get(
                 content_type=ContentType.objects.get_for_model(obj),
                 object_id=obj.id,
                 user=request.user)
             if likedislike.vote is not self.vote_type:
                 likedislike.vote = self.vote_type
-                likedislike.save(update_fields=['vote'])
+                likedislike.save(update_fields=['vote'])   
+                
+               
 
             else:
                 likedislike.delete()
+                obj.is_liked=False
+                obj.save()
 
         except LikeDislike.DoesNotExist:
             obj.votes.create(user=request.user, vote=self.vote_type)
+            obj.is_liked=True
+            obj.save()
         serializer = BookSerializer(obj)
-
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
@@ -89,9 +96,10 @@ class RatingsView(ListCreateAPIView):
         """
         method to post a rating for an article
         """
+
         data = self.serializer_class.update_data(
             request.data.get("book", {}), id)
-
+        print(data)
         serializer = self.serializer_class(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -103,6 +111,7 @@ class BookmarkView(ListCreateAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = BookmarkSerializer
     queryset = Bookmark.objects.all()
+
 
     def create(self, request, *args, **kwargs):
         book = get_object_or_404(BookModel, id=self.kwargs.get('id'))

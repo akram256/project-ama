@@ -113,22 +113,18 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
     user=UserSerializer()
 
     def update(self, instance, validated_data):
-        print(instance)
-        print(validated_data)
-        validated_data=validated_data['user']
-        logger.info(instance.user.email)
-        logger.info(validated_data)
-        instance.user.email = swap(validated_data.get('email'), instance.user.email)
-        instance.user.first_name = swap(validated_data.get('first_name'), instance.user.first_name)
-        instance.user.last_name = swap(validated_data.get('last_name'), instance.user.last_name)
-        logger.info(instance.user.email)
-        instance.user.save()
+        user_data=validated_data['user']
+        instance.user.email = swap(user_data.get('email'), instance.user.email)
+        instance.user.first_name = swap(user_data.get('first_name'), instance.user.first_name)
+        instance.user.last_name = swap(user_data.get('last_name'), instance.user.last_name)
+        instance.image= swap(validated_data.get('image'),instance.image)
+        instance.save()
         return instance
-
 
     class Meta:
         model=UserProfile
         fields=('id','user','image')
+
 
 class SubcriptionSerializer(serializers.Serializer):
     amount = serializers.CharField(required=True, allow_blank=True, max_length=100)
