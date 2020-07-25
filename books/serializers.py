@@ -11,7 +11,7 @@ class BookSerializer(serializers.ModelSerializer):
     dislikes = serializers.SerializerMethodField()
     class Meta:
         model=BookModel
-        fields=['id','name','cover_image','book_url','price','author','likes','dislikes', 'is_liked','is_rated','average_rating',
+        fields=['id','name','cover_image','book_url','price','author','likes','dislikes', 'is_liked','is_rated','is_bookmarked','average_rating',
             'user_rates',]
 
     # Gets all the books likes
