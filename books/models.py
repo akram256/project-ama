@@ -60,6 +60,8 @@ class BookModel(BaseAbstractModel):
     author = models.CharField(max_length=300, blank=True, null=True)
     votes = GenericRelation(LikeDislike, related_name='books')
     user_rates = models.CharField(max_length=10, default=0)
+    is_liked=models.BooleanField(default=False)
+    is_rated=models.BooleanField(default=False)
     # category = models.CharField(max_length=300, blank=True, null=True)
 
     def __str__(self):
@@ -85,6 +87,10 @@ class Rating(models.Model):
 
     class Meta:
         ordering = ["-score"]
+    
+    @property
+    def is_rated(self):
+        return self.book.is_rated
 
 class Bookmark(BaseAbstractModel):
     """
