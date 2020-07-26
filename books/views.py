@@ -128,6 +128,7 @@ class BookmarkView(ListCreateAPIView):
 
     def perform_create(self, serializer, book):
         book.is_bookmarked=True
+        book.save()
         serializer.save(user=self.request.user, book=book)
 
 
