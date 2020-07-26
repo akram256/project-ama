@@ -144,6 +144,9 @@ class UnBookmarkView(DestroyAPIView):
         if not instance:
             return Response({"message": "book not found"},
                             status=status.HTTP_404_NOT_FOUND)
+        book=BookModel.objects.get(id=self.kwargs['id'])
+        book.is_bookmarked=False
+        book.save()
         self.perform_destroy(instance)
         return Response({"message": "Book successfully unbookmarked"},
                         status=status.HTTP_200_OK)
