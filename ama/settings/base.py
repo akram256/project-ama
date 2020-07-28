@@ -118,8 +118,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-CELERY_BROKER_URL = 'redis://{}:{}'.format(os.environ.get('REDIS_HOST'), os.environ.get('REDIS_PORT'))
-CELERY_RESULT_BACKEND = 'redis://{}:{}'.format(os.environ.get('REDIS_HOST'), os.environ.get('REDIS_PORT'))
+# CELERY_BROKER_URL = 'redis://{}:{}'.format(os.environ.get('REDIS_HOST'), os.environ.get('REDIS_PORT'))
+# CELERY_RESULT_BACKEND = 'redis://{}:{}'.format(os.environ.get('REDIS_HOST'), os.environ.get('REDIS_PORT'))
+CELERY_BROKER_URL=os.environ.get('REDIS_URL'),
+CELERY_RESULT_BACKEND=os.environ.get('REDIS_URL'),
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
@@ -128,6 +130,13 @@ CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 691200}
 CELERY_ALWAYS_EAGER=False
 TIME_ZONE = 'UTC'
 
+
+CACHES = {
+    "default": {
+         "BACKEND": "redis_cache.RedisCache",
+         "LOCATION": os.environ.get('REDIS_URL'),
+    }
+}
 # AWS Credentials
 # AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
 # AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
