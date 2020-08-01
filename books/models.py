@@ -21,6 +21,9 @@ class BookCategoryModel(BaseAbstractModel):
     name = models.CharField(max_length=300, blank=True, null=True)
     cover_image= models.ImageField(upload_to='category/', null=True)
 
+    def __str__(self):
+        return self.name
+
 
 class LikeDislikeManager(models.Manager):
     # Gets all the votes greater than 0. In this case they're likes.
