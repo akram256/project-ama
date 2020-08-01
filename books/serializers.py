@@ -67,15 +67,15 @@ class RatingSerializer(serializers.ModelSerializer):
         book = validated_data.get("book", None)
         score = validated_data.get("score", 0)
 
+        book.is_rated=True
+        book.save()
         try:
             rating = Rating.objects.get(
                 book__id=book.id)
         except Rating.DoesNotExist:
             return Rating.objects.create(**validated_data)
         rating.score = score
-        book.is_rated=True
         rating.save()
-        book.save()
         return rating
 
     class Meta:
