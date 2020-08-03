@@ -65,7 +65,7 @@ class BookModel(BaseAbstractModel):
         Model for books
     """
     name = models.CharField(max_length=300, blank=True, null=True)
-    cover_image=  models.ImageField(upload_to='books/', null=True)
+    cover_image=  models.CharField(max_length=300, blank=True, null=True)
     book_url = models.CharField(max_length=300, blank=True, null=True)
     price = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
     author = models.CharField(max_length=300, blank=True, null=True)
@@ -75,7 +75,7 @@ class BookModel(BaseAbstractModel):
     is_rated=models.BooleanField(default=False)
     is_bookmarked=models.BooleanField(default=False)
     book_category = models.ForeignKey(BookClass,
-                                on_delete=models.CASCADE, default=1)
+                                on_delete=models.CASCADE)
     # category = models.CharField(max_length=300, blank=True, null=True)
 
     def __str__(self):
