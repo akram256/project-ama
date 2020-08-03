@@ -10,8 +10,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser, AllowAny,IsAuthenticated
 
-from .models import BookModel,BookCategoryModel,Bookmark
-from .serializers import BookSerializer,BookCategorySerializer, RatingSerializer,BookmarkSerializer
+from .models import BookModel,BookCategoryModel,Bookmark, BookClass
+from .serializers import BookSerializer,BookCategorySerializer,BookClassSerializer, RatingSerializer,BookmarkSerializer
 from authentication.models import User
 from django.contrib.contenttypes.models import ContentType
 from .models import LikeDislike
@@ -32,6 +32,20 @@ class BookView(ListAPIView):
         return Response({"message":"Book has been  successfully Input"},
                         status=status.HTTP_201_CREATED)
 
+class BookClassView(ListAPIView):
+    """"implements categories of books"""
+
+    serializer_class=BookClassSerializer
+    permission_classes=(AllowAny,)
+    queryset=BookClass.objects.all()
+
+    def post(self, request):
+        post_data = {"name":request.data["name"]}
+        serializer = self.get_serializer(data=post_data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"message":"Book Category has been  successfully Input"},
+                        status=status.HTTP_201_CREATED)
 
 class ChoiceView(ListCreateAPIView):
     """Implements the like and dislike endpoints."""
