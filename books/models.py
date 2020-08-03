@@ -74,8 +74,8 @@ class BookModel(BaseAbstractModel):
     is_liked=models.BooleanField(default=False)
     is_rated=models.BooleanField(default=False)
     is_bookmarked=models.BooleanField(default=False)
-    book_category = models.ForeignKey(BookClass,
-                                on_delete=models.CASCADE)
+    # book_category = models.ForeignKey(BookClass,
+    #                             on_delete=models.CASCADE)
     # category = models.CharField(max_length=300, blank=True, null=True)
 
     def __str__(self):
