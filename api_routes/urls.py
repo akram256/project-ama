@@ -15,6 +15,7 @@ urlpatterns = [
     path("view/profile/<str:id>", UserProfileView.as_view(),name='view-profile'),
     path("subscribe", AddSubscription.as_view(), name='subscribe'),
     path("verify/subscribe", VerifySubscriptionView.as_view(), name='verify-subscribe'),
+ 
 
 
 

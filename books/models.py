@@ -51,6 +51,14 @@ class LikeDislike(BaseAbstractModel):
 
     objects = LikeDislikeManager()
 
+class BookClass(BaseAbstractModel):
+    """Model for book categories"""
+
+    name=models.CharField(max_length=300, blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
 
 class BookModel(BaseAbstractModel):
     """
@@ -66,10 +74,16 @@ class BookModel(BaseAbstractModel):
     is_liked=models.BooleanField(default=False)
     is_rated=models.BooleanField(default=False)
     is_bookmarked=models.BooleanField(default=False)
+    book_category = models.ForeignKey(BookClass,
+                                on_delete=models.CASCADE)
     # category = models.CharField(max_length=300, blank=True, null=True)
 
     def __str__(self):
         return self.name
+
+    @property
+    def category(self):
+        return self.book_category.name
     
     @property
     def average_rating(self):
@@ -89,6 +103,7 @@ class Rating(models.Model):
     rated_on = models.DateTimeField(auto_now_add=True)
     score = models.DecimalField(max_digits=5, decimal_places=2)
 
+
     class Meta:
         ordering = ["-score"]
     
@@ -102,3 +117,8 @@ class Bookmark(BaseAbstractModel):
     """
     user = models.ForeignKey(User, blank=False, on_delete=models.CASCADE)
     book = models.ForeignKey(BookModel, blank=False, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.book
+
+
