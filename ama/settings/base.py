@@ -120,6 +120,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # CELERY_BROKER_URL = 'redis://{}:{}'.format(os.environ.get('REDIS_HOST'), os.environ.get('REDIS_PORT'))
+# print(CELERY_BROKER_URL)
 # CELERY_RESULT_BACKEND = 'redis://{}:{}'.format(os.environ.get('REDIS_HOST'), os.environ.get('REDIS_PORT'))
 # CELERY_ACCEPT_CONTENT = ['application/json']
 # CELERY_RESULT_SERIALIZER = 'json'
@@ -129,13 +130,20 @@ AUTH_PASSWORD_VALIDATORS = [
 # CELERY_ALWAYS_EAGER=False
 # TIME_ZONE = 'UTC'
 
-REDIS_HOST = os.environ.get('REDIS_HOST'),
-REDIS_PORT = os.environ.get('REDIS_PORT'),
-CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
+# REDIS_HOST = os.environ.get('REDIS_HOST'),
+# REDIS_PORT = os.environ.get('REDIS_PORT'),
+# CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
 
-# for Heroku
-CELERY_BROKER_URL = os.environ.get('REDIS_URL', 'redis://' + str(REDIS_HOST) + ':' + str(REDIS_PORT) + '/0')
-CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL', 'redis://' + str(REDIS_HOST) + ':' + str(REDIS_PORT) + '/0')
+# # for Heroku
+CELERY_BROKER_URL = os.environ.get('REDIS_URL')
+CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL')
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 691200}
+CELERY_ALWAYS_EAGER=False
+TIME_ZONE = 'UTC'
 
 
 
