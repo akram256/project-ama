@@ -110,7 +110,7 @@ class VerifyAccount(APIView):
         id = payload['id']
         user = User.objects.filter(id=id)
         user.update(is_active=True)
-        return HttpResponseRedirect('https://ama256.herokuapp.com/api/v1/verify/template')
+        return HttpResponseRedirect('https://ama256.herokuapp.com/api/v1/verify/account')
         # return Response(
         #     {
         #         'message': 'Account successfully verified,'
