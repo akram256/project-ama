@@ -19,6 +19,10 @@ from django.contrib.auth.hashers import check_password
 from django.urls import reverse
 from django.http import HttpResponse, Http404
 from django.contrib.auth import authenticate
+from django.shortcuts import render
+from django.template.loader import get_template
+from django.views.generic import TemplateView
+from django.http import HttpResponseRedirect
 
 from rest_framework import generics
 from rest_framework import status
@@ -73,7 +77,7 @@ class RegistrationAPIView(generics.GenericAPIView):
         else:
             return Response({'message':'Email: {} is not valid'.format(email),}, status=status.HTTP_400_BAD_REQUEST)
         if serializer.is_valid(raise_exception=True):
-            user=User(email=email,password=password,first_name=first_name,last_name=last_name,is_active=True,role='USER')
+            user=User(email=email,password=password,first_name=first_name,last_name=last_name,role='USER')
             user.set_password(password)
             user.save()
             UserProfile.objects.create(user=user) 
@@ -82,11 +86,13 @@ class RegistrationAPIView(generics.GenericAPIView):
             full_url= request.build_absolute_uri(email_verification_url + '?token='+user.token)
             email_data = {'subject':'Welcome To Africa My Africa','email_from':settings.EMAIL_FROM}
             content = render_to_string('activate_account.html',{'token':'{}'.format(full_url),} )
+            print(email)
+            print(email_data)
             send_user_email.delay(email,content,**email_data)
 
             details = {'field':'auth','password':password,'email':email}
             logger.info(f'user {email} has been registered')
-            return Response({'message': "Registration successful", 'status': '00','token':user.token, 
+            return Response({'message': "Registration successful, Kindly check your email to activate your account", 'status': '00','token':user.token, 
             # Kindly Check your email for complete the registration
                     'user_id':user.id,
                     'profile_id':profile.id,
@@ -104,12 +110,17 @@ class VerifyAccount(APIView):
         id = payload['id']
         user = User.objects.filter(id=id)
         user.update(is_active=True)
-        return Response(
-            {
-                'message': 'Account successfully verified,'
-                'your free to  now login'
-            },
-            status=status.HTTP_200_OK)
+        return HttpResponseRedirect('https://ama256.herokuapp.com/api/v1/verify/template')
+        # return Response(
+        #     {
+        #         'message': 'Account successfully verified,'
+        #         'your free to  now login'
+        #     },
+        #     status=status.HTTP_200_OK)
+
+class TestView(TemplateView):
+    def get(self, request):
+        return render(request,'verify.html')
 
 class SchoolRegistrationAPIView(generics.GenericAPIView):
     pass
