@@ -200,7 +200,7 @@ class LoginAPIView(APIView):
             else:
                 if not user.is_active:
                     raise serializers.ValidationError(
-                        'This user has been deactivated.'
+                        'This account is not verified, Kindly check your email to verify account.'
                     )
                 else:
                     logger.info('login successful for {}'.format(email))
