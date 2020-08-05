@@ -1,5 +1,5 @@
 from django.urls import path, include
-from authentication.views import LoginAPIView,AddSubscription,VerifySubscriptionView,VerifyAccount,UserProfileView, RegistrationAPIView,UpdateProfileView,SchoolRegistrationAPIView, AgeCategoryView
+from authentication.views import LoginAPIView,TestView,AddSubscription,VerifySubscriptionView,VerifyAccount,UserProfileView, RegistrationAPIView,UpdateProfileView,SchoolRegistrationAPIView, AgeCategoryView
 # ,SchoolLoginAPIView
 
 app_name= 'authentication'
@@ -15,6 +15,8 @@ urlpatterns = [
     path("view/profile/<str:id>", UserProfileView.as_view(),name='view-profile'),
     path("subscribe", AddSubscription.as_view(), name='subscribe'),
     path("verify/subscribe", VerifySubscriptionView.as_view(), name='verify-subscribe'),
+    path("verify/template", TestView.as_view(), name='verif-template'),
+    
  
 
 
