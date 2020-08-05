@@ -15,7 +15,7 @@ urlpatterns = [
     path("view/profile/<str:id>", UserProfileView.as_view(),name='view-profile'),
     path("subscribe", AddSubscription.as_view(), name='subscribe'),
     path("verify/subscribe", VerifySubscriptionView.as_view(), name='verify-subscribe'),
-    path("verify/template", TestView.as_view(), name='verif-template'),
+    path("verify/account", TestView.as_view(), name='verif-template'),
     
  
 
