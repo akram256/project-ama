@@ -86,8 +86,6 @@ class RegistrationAPIView(generics.GenericAPIView):
             full_url= request.build_absolute_uri(email_verification_url + '?token='+user.token)
             email_data = {'subject':'Welcome To Africa My Africa','email_from':settings.EMAIL_FROM}
             content = render_to_string('activate_account.html',{'token':'{}'.format(full_url),} )
-            print(email)
-            print(email_data)
             send_user_email.delay(email,content,**email_data)
 
             details = {'field':'auth','password':password,'email':email}
@@ -109,76 +107,12 @@ class VerifyAccount(APIView):
         payload = jwt.decode(token, settings.SECRET_KEY, 'utf-8')
         id = payload['id']
         user = User.objects.filter(id=id)
-        user.update(is_active=True)
+        user.update(is_active=True,is_new_user=True)
         return HttpResponseRedirect('https://ama256.herokuapp.com/api/v1/verify/account')
-        # return Response(
-        #     {
-        #         'message': 'Account successfully verified,'
-        #         'your free to  now login'
-        #     },
-        #     status=status.HTTP_200_OK)
 
 class TestView(TemplateView):
     def get(self, request):
         return render(request,'verify.html')
-
-class SchoolRegistrationAPIView(generics.GenericAPIView):
-    pass
-
-#     """Register new school users."""
-
-#     serializer_class = RegistrationSerializer
-#     permission_class = (AllowAny,)
-
-#     def post(self, request):
-#         school_users = User.objects.all()
-#         serializer = self.serializer_class(data=request.data)
-#         password = request.data.get('password')
-#         email = request.data.get('email')
-#         school_name=request.data.get('school_name')
-#         school_address=request.data.get('school_address')
-#         email= str(email)
-#         email = email.lower()
-#         email_pattern = services.EMAIL_PATTERN
-#         password_pattern = services.PASSWORD_PATTERN
-#         url_param = get_current_site(request).domain
-
-#         if not re.match(password_pattern,password):
-#             return Response({'message':'Password is weak, please use atleast 1 UPPERCASE, 1 LOWERCASE, 1 SYMBOL',}, status=status.HTTP_400_BAD_REQUEST)
-        
-#         if re.match(email_pattern,email):
-#             user = [i for i in school_users if i.email == email]
-#             if user:
-#                 return Response({'message':'This email: {} , already belongs to a user on ama'.format(email),}, status=status.HTTP_400_BAD_REQUEST)
-#             else:
-#                 logger.info('email looks good')
-#         else:
-#             return Response({'message':'Email: {} is not valid'.format(email),}, status=status.HTTP_400_BAD_REQUEST)
-#         if serializer.is_valid(raise_exception=True):
-#             user=User(email=email,password=password,school_name=school_name,school_address=school_address,is_active=True,role='SCHOOL')
-#             user.set_password(password)
-#             user.save()
-           
-#             UserProfile.objects.create(user=user)
-#             # userx= UserProfile.objects.create(user=user)
-#             # print(userx,'hewre we are')
-#             # email_verification_url=reverse('Auth:verify')
-#             # full_url= request.build_absolute_uri(email_verification_url + '?token='+user.token)
-#             # email_data = {'subject':'Welcome To Africa My Africa','email_from':settings.EMAIL_FROM}
-#             # content = render_to_string('activate_account.html',{'token':'{}'.format(full_url),} )
-#             # send_user_email.delay(email,content,**email_data)
-#             details = {'field':'auth','password':password,'email':email}
-#             logger.info(f'user {email} has been registered')
-#             return Response({'message': "School Registration successful", 'status': '00',
-#                             'user_id':user.id, 
-#                              'token':user.token,
-#                             #  'school_name':school.school_name,
-#                             #  'school_address':school.school_address,
-#                             #  'email':school.school_email,
-#                              }, status=status.HTTP_200_OK)
-#         return Response({'message': "Invalid credentials", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 class LoginAPIView(APIView):
     """
@@ -213,6 +147,7 @@ class LoginAPIView(APIView):
                     'first_name':user.first_name,
                     'last_name':user.last_name,
                     'email':user.email,
+                    'is_new_user':user.is_new_user,
 
                     'message':'user loggedin successfully'
                 }
