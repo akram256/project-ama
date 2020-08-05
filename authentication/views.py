@@ -171,7 +171,18 @@ class AgeCategoryView(ListAPIView):
                         status=status.HTTP_201_CREATED)
 
 
-class UpdateProfileView(RetrieveUpdateDestroyAPIView):
+class UserProfileView(RetrieveUpdateDestroyAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = UpdateProfileSerializer
+    lookup_field='id'
+    queryset=UserProfile.objects.all()
+
+    def get_object(self):
+        return get_object_or_404(
+            self.get_queryset(), id=self.kwargs.get('id'))
+
+
+class UpdateProfile(APIView):
 
     permission_classes = (IsAuthenticated,)
     serializer_class = UpdateProfileSerializer
@@ -191,6 +202,7 @@ class UpdateProfileView(RetrieveUpdateDestroyAPIView):
         else:
             userprofile = self.get_object(id)[0]
             user = self.get_object(id)[1]
+            print(id)
         
         if not userprofile:
             return Response({'message':'user does not exist', 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
@@ -203,7 +215,6 @@ class UpdateProfileView(RetrieveUpdateDestroyAPIView):
             image=request.data['image']
         except:
             image=None
-        print(image)
         email=email.lower()
         email_pattern = services.EMAIL_PATTERN
 
@@ -211,7 +222,7 @@ class UpdateProfileView(RetrieveUpdateDestroyAPIView):
             if re.match(email_pattern,email):
                 userx = [i for i in users if i.email == email]
                 if userx:
-                    return Response({'message':'This email: {} , already belongs to a user on lottoly'.format(email),}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'message':'This email: {} , already belongs to a user on ama'.format(email),}, status=status.HTTP_400_BAD_REQUEST)
                 else:
                     rdata['user']['email'] = email
             else:
@@ -220,24 +231,11 @@ class UpdateProfileView(RetrieveUpdateDestroyAPIView):
             rdata['user']['email'] = ''
       
         serializer = self.serializer_class(userprofile, data=request.data)
-        # print(request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            # print(serializer.data)
             return Response({'message':'user profile updated','status':'00','data':serializer.data}, status=status.HTTP_200_OK)
         return Response({'message': "Invalid credentials", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
 
-
-
-class UserProfileView(RetrieveUpdateDestroyAPIView):
-    permission_classes = (IsAuthenticated,)
-    serializer_class = UpdateProfileSerializer
-    lookup_field='id'
-    queryset=UserProfile.objects.all()
-
-    def get_object(self):
-        return get_object_or_404(
-            self.get_queryset(), id=self.kwargs.get('id'))
 
 class AddSubscription(APIView):
     permission_classes = (IsAuthenticated,)
