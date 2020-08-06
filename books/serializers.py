@@ -96,10 +96,11 @@ class BookmarkSerializer(serializers.ModelSerializer):
     book__id=serializers.ReadOnlyField(source='book.id')
     rating = serializers.ReadOnlyField(source='book.average_rating')
     is_bookmarked = serializers.ReadOnlyField(source='book.is_bookmarked')
+    cover_image=serializers.ReadOnlyField(source='book.cover_image')
     # likes = serializers.ReadOnlyField(source='book.votes.likes')
     class Meta:
         model = Bookmark
-        fields = ('Reader','first_name','book__id','book_name','book_url','price','rating','is_bookmarked')
+        fields = ('Reader','first_name','book__id','book_name','cover_image','book_url','price','rating','is_bookmarked')
 
 
 class BookClassSerializer(serializers.ModelSerializer):
@@ -110,4 +111,4 @@ class BookClassSerializer(serializers.ModelSerializer):
 class LikeDislikeSerializer(serializers.ModelSerializer):
     class Meta:
         model=LikeDislike
-        fields=('id','vote','book','content_type','object_id','created_at')
+        fields=('id','vote','book','book_cover','book_url','content_type','object_id','created_at')
