@@ -1,7 +1,7 @@
 from django.urls import path, include
 
 from books.models import LikeDislike, LikeDislikeManager,BookModel
-from books.views import ChoiceView,BookView,BookClassView,BookCategoryView,RatingsView,BookmarkView,UnBookmarkView,ListBookmarksView
+from books.views import ChoiceView,BookView,BookClassView,ListFavoriteView,BookCategoryView,RatingsView,BookmarkView,UnBookmarkView,ListBookmarksView
 
 
 app_name= 'books'
@@ -28,6 +28,7 @@ urlpatterns = [
          name='unbookmark_articles'),
     path('view/bookmarks/', ListBookmarksView.as_view(),
          name='bookmarks'),
+    path('view/favorite',ListFavoriteView.as_view(),name='liked')
 
 
 ]
