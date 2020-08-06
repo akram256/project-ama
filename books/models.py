@@ -59,6 +59,16 @@ class LikeDislike(BaseAbstractModel):
         book= BookModel.objects.get(id=self.object_id)
         return book.name
     
+    @property
+    def book_cover(self):
+        book= BookModel.objects.get(id=self.object_id)
+        return book.cover_image
+    
+    @property
+    def book_url(self):
+        book= BookModel.objects.get(id=self.object_id)
+        return book.book_url
+    
 class BookClass(BaseAbstractModel):
     """Model for book categories"""
 
