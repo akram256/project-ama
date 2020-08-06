@@ -24,6 +24,7 @@ from django.template.loader import get_template
 from django.views.generic import TemplateView
 from django.http import HttpResponseRedirect
 
+
 from rest_framework import generics
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -59,11 +60,15 @@ class RegistrationAPIView(generics.GenericAPIView):
         first_name=request.data.get('first_name')
         last_name=request.data.get('last_name')
         email= str(email)
-        print(email)
         email = email.lower()
         email_pattern = services.EMAIL_PATTERN
         password_pattern = services.PASSWORD_PATTERN
         url_param = get_current_site(request).domain
+        cache_key = email
+        print(cache.get(cache_key))
+        if cache.get(cache_key):
+          
+            return Response({'message': f"Please visit your email {email} to complete registration", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
 
         if not re.match(password_pattern,password):
             return Response({'message':'Password is weak, please use atleast 1 UPPERCASE, 1 LOWERCASE, 1 SYMBOL',}, status=status.HTTP_400_BAD_REQUEST)

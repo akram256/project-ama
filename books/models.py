@@ -51,6 +51,14 @@ class LikeDislike(BaseAbstractModel):
 
     objects = LikeDislikeManager()
 
+    def __str__(self):
+        return self.use
+    
+    @property
+    def book(self):
+        book= BookModel.objects.get(id=self.object_id)
+        return book.name
+    
 class BookClass(BaseAbstractModel):
     """Model for book categories"""
 
@@ -77,6 +85,8 @@ class BookModel(BaseAbstractModel):
     is_bookmarked=models.BooleanField(default=False)
     book_category = models.ForeignKey(BookClass,
                                 on_delete=models.CASCADE)
+    # user=models.ForeignKey(User,
+    #                             on_delete=models.CASCADE,null=True)
     # category = models.CharField(max_length=300, blank=True, null=True)
 
     def __str__(self):

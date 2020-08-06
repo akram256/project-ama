@@ -11,7 +11,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAdminUser, AllowAny,IsAuthenticated
 
 from .models import BookModel,BookCategoryModel,Bookmark, BookClass
-from .serializers import BookSerializer,BookCategorySerializer,BookClassSerializer, RatingSerializer,BookmarkSerializer
+from .serializers import BookSerializer,BookCategorySerializer,LikeDislikeSerializer,BookClassSerializer, RatingSerializer,BookmarkSerializer
 from authentication.models import User
 from django.contrib.contenttypes.models import ContentType
 from .models import LikeDislike
@@ -57,8 +57,6 @@ class ChoiceView(ListCreateAPIView):
 
     def post(self, request, id):
         obj = self.model.objects.get(id=id)
-
-        # is_liked=obj.is_liked
         try:
             
             likedislike = LikeDislike.objects.get(
@@ -69,8 +67,6 @@ class ChoiceView(ListCreateAPIView):
                 likedislike.vote = self.vote_type
                 likedislike.save(update_fields=['vote'])   
                 
-               
-
             else:
                 likedislike.delete()
                 obj.is_liked=False
@@ -113,7 +109,6 @@ class RatingsView(ListCreateAPIView):
 
         data = self.serializer_class.update_data(
             request.data.get("book", {}), id)
-        print(data)
         serializer = self.serializer_class(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -175,5 +170,14 @@ class ListBookmarksView(ListAPIView):
         bookmarks = self.queryset.filter(
             user_id=request.user)
         serializer = self.serializer_class(bookmarks, many=True)
+        return Response({'data':serializer.data, },status=status.HTTP_200_OK)
+
+class ListFavoriteView(ListAPIView):
+    serializer_class = LikeDislikeSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        likedislike = LikeDislike.objects.filter(user=request.user, vote=1)
+        serializer = self.serializer_class(likedislike, many=True)
         return Response({'data':serializer.data, },status=status.HTTP_200_OK)
                         
