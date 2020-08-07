@@ -82,7 +82,7 @@ class RegistrationAPIView(generics.GenericAPIView):
         else:
             return Response({'message':'Email: {} is not valid'.format(email),}, status=status.HTTP_400_BAD_REQUEST)
         if serializer.is_valid(raise_exception=True):
-            user=User(email=email,password=password,first_name=first_name,last_name=last_name,role='USER')
+            user=User(email=email,password=password,first_name=first_name,last_name=last_name,role='USER',is_new_user=True)
             user.set_password(password)
             user.save()
             UserProfile.objects.create(user=user) 
@@ -112,7 +112,7 @@ class VerifyAccount(APIView):
         payload = jwt.decode(token, settings.SECRET_KEY, 'utf-8')
         id = payload['id']
         user = User.objects.filter(id=id)
-        user.update(is_active=True,is_new_user=True)
+        user.update(is_active=True)
         return HttpResponseRedirect('https://ama256.herokuapp.com/api/v1/verify/account')
 
 class TestView(TemplateView):
@@ -125,14 +125,19 @@ class LoginAPIView(APIView):
     """
     permission_classes = [AllowAny]
     serializer_class = LoginSerializer
+    queryset=User.objects.all()
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         email = request.data.get('email')
         password = request.data.get('password')
-
+        # new_user=User.objects.filter(email=email, is_new_user=True)
+        # print(new_user)
+        # if new_user.exists():
         if serializer.is_valid(raise_exception=True):
+        
             user = authenticate(email=email, password=password) 
+            # if user.
             if user is None:
                 users = User.objects.all()
                 return Response ({'Invalid email or password'}, status=status.HTTP_400_BAD_REQUEST)
@@ -144,6 +149,7 @@ class LoginAPIView(APIView):
                 else:
                     logger.info('login successful for {}'.format(email))
             profile= UserProfile.objects.get(user=user) 
+
             resp ={
                     'status':'00',
                     'id':user.id,
@@ -156,6 +162,8 @@ class LoginAPIView(APIView):
 
                     'message':'user loggedin successfully'
                 }
+            user.is_new_user=False
+            user.save()
             return Response(resp, status=status.HTTP_200_OK)
                 
         return Response({'message': "Invalid credentials", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
