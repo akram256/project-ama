@@ -52,7 +52,7 @@ class LikeDislike(BaseAbstractModel):
     objects = LikeDislikeManager()
 
     def __str__(self):
-        return self.use
+        return str(self.user)
     
     @property
     def book(self):
@@ -95,12 +95,11 @@ class BookModel(BaseAbstractModel):
     is_bookmarked=models.BooleanField(default=False)
     book_category = models.ForeignKey(BookClass,
                                 on_delete=models.CASCADE)
+    def __str__(self):
+        return self.name
     # user=models.ForeignKey(User,
     #                             on_delete=models.CASCADE,null=True)
     # category = models.CharField(max_length=300, blank=True, null=True)
-
-    def __str__(self):
-        return self.name
 
     @property
     def category(self):
@@ -113,6 +112,9 @@ class BookModel(BaseAbstractModel):
         """
         ratings = self.scores.all().aggregate(score=Avg("score"))
         return float('%.2f' % (ratings["score"] if ratings['score'] else 0))
+
+    def __str__(self):
+        return str(self.name)
 
 
 class Rating(models.Model):
