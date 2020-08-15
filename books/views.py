@@ -4,14 +4,15 @@ from django.shortcuts import render
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 
+from rest_framework import serializers
 from rest_framework import viewsets
 from rest_framework.generics import ListCreateAPIView,ListAPIView,DestroyAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser, AllowAny,IsAuthenticated
 
-from .models import BookModel,BookCategoryModel,Bookmark, BookClass
-from .serializers import BookSerializer,BookCategorySerializer,LikeDislikeSerializer,BookClassSerializer, RatingSerializer,BookmarkSerializer
+from .models import BookModel,BookCategoryModel,Bookmark, BookClass,Comment
+from .serializers import BookSerializer,BookCategorySerializer,LikeDislikeSerializer,CommentSerializer,BookClassSerializer, RatingSerializer,BookmarkSerializer
 from authentication.models import User
 from django.contrib.contenttypes.models import ContentType
 from .models import LikeDislike
@@ -180,4 +181,41 @@ class ListFavoriteView(ListAPIView):
         likedislike = LikeDislike.objects.filter(user=request.user, vote=1)
         serializer = self.serializer_class(likedislike, many=True)
         return Response({'data':serializer.data, },status=status.HTTP_200_OK)
+
+
+
+class CommentView(ListCreateAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = CommentSerializer
+    lookup_field = 'id'
+    queryset = Comment.objects.all()
+
+    def list(self, request, *args, **kwargs):
+        queryset = Comment.objects.filter(
+            book=self.kwargs.get('id'))
+        serializer = CommentSerializer(queryset, many=True)
+        if queryset.count() == 0:
+            raise serializers.ValidationError("No comments found")
+
+        if queryset.count() == 1:
+            return Response({"Comment": serializer.data})
+
+        return Response(
+            {"Comments": serializer.data,
+             "commentsCount": queryset.count()})
+
+    def create(self, request, *args, **kwargs):
+        book = get_object_or_404(BookModel, id=self.kwargs.get('id'))
+        comment = request.data.get('comment', {})
+        serializer = self.get_serializer(data=comment)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer,book)
+        return Response(serializer.data,
+                        status=status.HTTP_201_CREATED)
+  
+                    
+    def perform_create(self, serializer, book):
+
+        serializer.save(user=self.request.user,
+                        book=book)
                         
