@@ -1,18 +1,35 @@
 import logging
 from rest_framework import serializers
-from .models import BookModel,BookCategoryModel,Rating, Bookmark, BookClass,LikeDislike
+from .models import BookModel,BookCategoryModel,Rating, Bookmark, BookClass,LikeDislike, Comment
 
 
 logger = logging.getLogger(__name__)
 
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = (
+            'id',
+            'body',
+            'created_at',
+            'updated_at',
+            'user',
+            'first_name',
+            'book',
+            'name')
+        read_only_fields = ('book', 'user',)
+
+
 class BookSerializer(serializers.ModelSerializer):
     """This is a serializer of books model"""
+    comments = serializers.StringRelatedField(many=True)
     likes = serializers.SerializerMethodField()
     dislikes = serializers.SerializerMethodField()
     class Meta:
         model=BookModel
         fields=['id','name','cover_image','book_url','price','author','likes','dislikes', 'is_liked','is_rated','is_bookmarked','average_rating',
-            'user_rates','book_category','category',]
+            'user_rates','book_category','category','comments']
 
     # Gets all the books likes
 
@@ -112,3 +129,6 @@ class LikeDislikeSerializer(serializers.ModelSerializer):
     class Meta:
         model=LikeDislike
         fields=('id','vote','book','book_cover','book_url','content_type','object_id','created_at')
+
+
+
