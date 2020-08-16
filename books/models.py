@@ -173,4 +173,17 @@ class Comment(BaseAbstractModel):
     def name(self):
         return self.book.name
 
+class FeedBack(BaseAbstractModel):
+    """Model for Feedback about the application"""
+    body= models.CharField(max_length=300, blank=True, null=True)
+    user=models.ForeignKey(
+        'authentication.User',
+        on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return self.user
+
+
+
 

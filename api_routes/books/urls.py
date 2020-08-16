@@ -1,7 +1,7 @@
 from django.urls import path, include
 
 from books.models import LikeDislike, LikeDislikeManager,BookModel
-from books.views import ChoiceView,BookView,CommentView,BookClassView,ListFavoriteView,BookCategoryView,RatingsView,BookmarkView,UnBookmarkView,ListBookmarksView
+from books.views import ChoiceView,BookView,CommentView,BookClassView,ListFavoriteView,BookCategoryView,RatingsView,FeedBackView,BookmarkView,UnBookmarkView,ListBookmarksView
 
 
 app_name= 'books'
@@ -31,7 +31,9 @@ urlpatterns = [
     path('view/favorite',ListFavoriteView.as_view(),name='liked'),
     path('books/<str:id>/comments/', CommentView.as_view(),
          name="get-comments"),
-    
+    path('feedback', FeedBackView.as_view(),
+         name="get-feeback"),
+
 
 
 

@@ -1,6 +1,6 @@
 import logging
 from rest_framework import serializers
-from .models import BookModel,BookCategoryModel,Rating, Bookmark, BookClass,LikeDislike, Comment
+from .models import BookModel,BookCategoryModel,Rating, Bookmark, BookClass,LikeDislike, Comment,FeedBack
 
 
 logger = logging.getLogger(__name__)
@@ -129,6 +129,13 @@ class LikeDislikeSerializer(serializers.ModelSerializer):
     class Meta:
         model=LikeDislike
         fields=('id','vote','book','book_cover','book_url','content_type','object_id','created_at')
+
+class FeedBackSerializer(serializers.ModelSerializer):
+    first_name = serializers.ReadOnlyField(source='user.first_name')
+    class Meta:
+        model=FeedBack
+        fields=('body','created_at','first_name')
+     
 
 
 

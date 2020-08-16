@@ -11,8 +11,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser, AllowAny,IsAuthenticated
 
-from .models import BookModel,BookCategoryModel,Bookmark, BookClass,Comment
-from .serializers import BookSerializer,BookCategorySerializer,LikeDislikeSerializer,CommentSerializer,BookClassSerializer, RatingSerializer,BookmarkSerializer
+from .models import BookModel,BookCategoryModel,Bookmark, BookClass,Comment, FeedBack
+from .serializers import BookSerializer,BookCategorySerializer,LikeDislikeSerializer,CommentSerializer,BookClassSerializer, RatingSerializer,BookmarkSerializer,FeedBackSerializer
 from authentication.models import User
 from django.contrib.contenttypes.models import ContentType
 from .models import LikeDislike
@@ -218,4 +218,16 @@ class CommentView(ListCreateAPIView):
 
         serializer.save(user=self.request.user,
                         book=book)
-                        
+
+class FeedBackView(ListAPIView):
+    serializer_class=FeedBackSerializer
+    permission_classes=(IsAuthenticated,)
+    queryset=FeedBack.objects.all()
+
+    def post(self, request):
+        post_data = {"body":request.data["body"]}
+        serializer = self.get_serializer(data=post_data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user)
+        return Response({"message":"Thank you for the feedback, We appreciate "},
+                        status=status.HTTP_201_CREATED)            
