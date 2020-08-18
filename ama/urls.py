@@ -20,8 +20,9 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('africamyafrica/', admin.site.urls),
-    path('api/v1/', include('api_routes.urls')),
+    path('api/v1/', include('api_routes.auth.urls')),
     path('api/v1/', include('api_routes.books.urls')),
+    path('api/v1/', include('api_routes.store.urls')),
 ]
 
 if settings.DEBUG:
