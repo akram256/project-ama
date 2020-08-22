@@ -27,7 +27,7 @@ class Store(BaseAbstractModel):
     variation= models.DecimalField(max_digits=12, decimal_places=2, null=True, default=Decimal('0.00'))
     origin=models.CharField(max_length=255, blank=True, null=True)
     category= models.ForeignKey(ProductCategory,
-                                on_delete=models.CASCADE,default=2)
+                                on_delete=models.CASCADE)
 
     
     def __str__(self):
