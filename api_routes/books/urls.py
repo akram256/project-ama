@@ -1,13 +1,13 @@
 from django.urls import path, include
 
 from books.models import LikeDislike, LikeDislikeManager,BookModel
-from books.views import ChoiceView,BookView,CommentView,BookClassView,ListFavoriteView,BookCategoryView,RatingsView,FeedBackView,BookmarkView,UnBookmarkView,ListBookmarksView
+from books.views import ChoiceView,BookRetrieveUpdateView,BookView,CommentView,BookClassView,ListFavoriteView,BookCategoryView,RatingsView,FeedBackView,BookmarkView,UnBookmarkView,ListBookmarksView
 
 
 app_name= 'books'
 urlpatterns = [
     path('books',BookView.as_view(),name='books'),
-
+    path('books/<str:id>',BookRetrieveUpdateView.as_view(),name='books'),
     path('books/<str:id>/like/',
          ChoiceView.as_view(vote_type=LikeDislike.LIKE, model=BookModel,
                             manager=LikeDislikeManager),

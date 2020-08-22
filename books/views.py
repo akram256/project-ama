@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 
 from rest_framework import serializers
 from rest_framework import viewsets
-from rest_framework.generics import ListCreateAPIView,ListAPIView,DestroyAPIView
+from rest_framework.generics import ListCreateAPIView,ListAPIView,DestroyAPIView,RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser, AllowAny,IsAuthenticated
@@ -32,6 +32,18 @@ class BookView(ListAPIView):
         serializer.save()
         return Response({"message":"Book has been  successfully Input"},
                         status=status.HTTP_201_CREATED)
+
+class BookRetrieveUpdateView(RetrieveUpdateDestroyAPIView):
+    """Handles retriving a single book"""
+    permission_classes =(AllowAny,)
+    serializer_class = BookSerializer
+    lookup_field = 'id'
+    queryset = BookModel.objects.all()
+
+    def get_object(self):
+        return get_object_or_404(
+            self.get_queryset(), id=self.kwargs.get('id'))
+
 
 class BookClassView(ListAPIView):
     """"implements categories of books"""
