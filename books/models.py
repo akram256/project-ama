@@ -155,13 +155,18 @@ class Comment(BaseAbstractModel):
     book = models.ForeignKey(
         'BookModel', on_delete=models.CASCADE, to_field="id", blank=False
     ,related_name='comments')
+    
     body = models.TextField(max_length=500)
 
     class Meta:
         unique_together = ('user','body')
+        
+        if unique_together == True:
+            unique_together = ('user','body')
+        else:
+            "User can not make the same comment twice"
 
     def __str__(self):
-        # return '%s ,%s' % (self.user,  self.body)
         return  '%s' % (self.body)
         
 
