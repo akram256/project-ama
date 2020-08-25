@@ -13,7 +13,7 @@ from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 
 from utils.models import BaseAbstractModel
-from authentication.models import User
+from authentication.models import User,UserProfile
 
 
 class BookCategoryModel(BaseAbstractModel):
@@ -169,6 +169,7 @@ class Comment(BaseAbstractModel):
     def __str__(self):
         return  '%s' % (self.body)
         
+   
 
     @property
     def first_name(self):

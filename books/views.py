@@ -13,9 +13,10 @@ from rest_framework.permissions import IsAdminUser, AllowAny,IsAuthenticated
 
 from .models import BookModel,BookCategoryModel,Bookmark, BookClass,Comment, FeedBack
 from .serializers import BookSerializer,BookCategorySerializer,LikeDislikeSerializer,CommentSerializer,BookClassSerializer, RatingSerializer,BookmarkSerializer,FeedBackSerializer
-from authentication.models import User
+from authentication.models import User, UserProfile
 from django.contrib.contenttypes.models import ContentType
 from .models import LikeDislike
+
 
 
 logger = logging.getLogger(__name__)
@@ -203,6 +204,7 @@ class CommentView(ListCreateAPIView):
     queryset = Comment.objects.all()
 
     def list(self, request, *args, **kwargs):
+        profile=UserProfile.objects.filter(user=request.user)
         queryset = Comment.objects.filter(
             book=self.kwargs.get('id'))
         serializer = CommentSerializer(queryset, many=True)
@@ -210,11 +212,13 @@ class CommentView(ListCreateAPIView):
             raise serializers.ValidationError("No comments found")
 
         if queryset.count() == 1:
-            return Response({"Comment": serializer.data})
+            return Response({"Comment": serializer.data,"image":profile[0].image, "commentsCount": queryset.count()})
 
         return Response(
-            {"Comments": serializer.data,
-             "commentsCount": queryset.count()})
+            {"image":profile[0].image,
+                "Comments": serializer.data,
+             "commentsCount": queryset.count(),
+             })
 
     def create(self, request, *args, **kwargs):
         book = get_object_or_404(BookModel, id=self.kwargs.get('id'))

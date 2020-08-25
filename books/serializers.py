@@ -1,5 +1,6 @@
 import logging
 from rest_framework import serializers
+from .models import UserProfile
 from .models import BookModel,BookCategoryModel,Rating, Bookmark, BookClass,LikeDislike, Comment,FeedBack
 
 
@@ -7,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = Comment
         fields = (
