@@ -212,7 +212,7 @@ class CommentView(ListCreateAPIView):
             raise serializers.ValidationError("No comments found")
 
         if queryset.count() == 1:
-            return Response({"Comment": serializer.data,"image":profile[0].image, "commentsCount": queryset.count()})
+            return Response({"Comment": serializer.data, "commentsCount": queryset.count()})
 
         return Response(
             {"image":profile[0].image,

@@ -19,6 +19,7 @@ class CommentSerializer(serializers.ModelSerializer):
             'user',
             'first_name',
             'book',
+            'image',
             'name')
         read_only_fields = ('book', 'user',)
 
