@@ -158,6 +158,13 @@ class Comment(BaseAbstractModel):
     
     body = models.TextField(max_length=500)
 
+    @property
+    def image(self):
+        profile=UserProfile.objects.filter(user=self.user)
+        return profile[0].image
+
+
+
     class Meta:
         unique_together = ('user','body')
         
