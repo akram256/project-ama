@@ -43,7 +43,7 @@ class Cart(BaseAbstractModel):
    
     product=models.ForeignKey(Store,
                                 on_delete=models.CASCADE)
-    user = models.ForeignKey(User, blank=False, on_delete=models.CASCADE,default="4a005b87-b821-48e2-9ecb-b92cafe09c80")
+    user = models.ForeignKey(User, blank=False, on_delete=models.CASCADE,default="f8715698-264a-491a-a694-81b9110460ab")
     
     def __str__(self):
         return str(self.product)
