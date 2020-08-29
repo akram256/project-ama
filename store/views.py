@@ -14,6 +14,7 @@ from rest_framework.permissions import IsAdminUser, AllowAny,IsAuthenticated
 
 from .models import ProductCategory, Store,Cart
 from .serializers import ProductCategorySerializer,StoreSerializer,CartSerializer
+from .filters import StoreFilter
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +30,7 @@ class StoreView(ListAPIView):
     serializer_class=StoreSerializer
     permission_classes=(AllowAny,)
     queryset = Store.objects.all()
+    filter_class = StoreFilter
 
 class ProductRetrieveUpdateView(RetrieveUpdateDestroyAPIView):
     """Handles retriving a single product"""
