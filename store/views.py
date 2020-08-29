@@ -64,20 +64,9 @@ class CartView(ListCreateAPIView):
     def perform_create(self, serializer, product):
         serializer.save(product=product)
 
-    # def post(self, request, id=None):
-    #     """
-    #     method to post add  to a cart
-    #     """
-    #     product = Store.objects.all()
-    #     # cart
-    #     product_amounts = product.values('price')
-    #     result_amounts = lambda x : sum([float(data['price']) for data in x])
-    #     product= Store.objects.filter(id=id)
-    #     data = {"product":id,"bag":product, "total_price":result_amounts}
-    #     serializer = self.serializer_class(data=data)
-    #     serializer.is_valid(raise_exception=True)
-    #     serializer.save()
-
-    #     return Response(serializer.data, status=status.HTTP_200_OK)
+class Cart(ListAPIView):
+    serializer_class = CartSerializer
+    permission_classes = (AllowAny,)
+    queryset = Cart.objects.all()
 
 
