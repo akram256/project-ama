@@ -44,25 +44,19 @@ class ProductRetrieveUpdateView(RetrieveUpdateDestroyAPIView):
 
 class CartView(ListCreateAPIView):
     serializer_class = CartSerializer
-    permission_classes = (AllowAny,)
-    queryset = Cart.objects.all()
+    permission_classes = (IsAuthenticated,)
+    # queryset = Cart.objects.all()
 
 
     def create(self, request, *args, **kwargs):
         product = get_object_or_404(Store, id=self.kwargs.get('id'))
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        instance = Cart.objects.filter(
-            product=product.id)
-        if instance:
-            return Response({"message": "Product already added"},
-                            status=status.HTTP_200_OK)
-
         self.perform_create(serializer,product)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def perform_create(self, serializer, product):
-        serializer.save(product=product)
+        serializer.save(user=self.request.user,product=product)
 
 class Cart(ListAPIView):
     serializer_class = CartSerializer

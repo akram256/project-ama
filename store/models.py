@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from django.db import models
 from django.conf import settings
-
+from authentication.models import User
 
 from utils.models import BaseAbstractModel
 
@@ -39,6 +39,11 @@ class Store(BaseAbstractModel):
 
 
 class Cart(BaseAbstractModel):
+
+   
     product=models.ForeignKey(Store,
                                 on_delete=models.CASCADE)
-    # total_price=models.DecimalField(max_digits=12, decimal_places=2, null=True, default=Decimal('0.00'))
+    user = models.ForeignKey(User, blank=False, on_delete=models.CASCADE,default="4a005b87-b821-48e2-9ecb-b92cafe09c80")
+    
+    def __str__(self):
+        return str(self.product)
