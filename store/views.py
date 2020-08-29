@@ -1,4 +1,5 @@
 import logging
+from decimal import Decimal
 
 from django.shortcuts import render
 from django.conf import settings
@@ -13,6 +14,7 @@ from rest_framework.permissions import IsAdminUser, AllowAny,IsAuthenticated
 
 from .models import ProductCategory, Store,Cart
 from .serializers import ProductCategorySerializer,StoreSerializer,CartSerializer
+from .filters import StoreFilter
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +30,7 @@ class StoreView(ListAPIView):
     serializer_class=StoreSerializer
     permission_classes=(AllowAny,)
     queryset = Store.objects.all()
+    filter_class = StoreFilter
 
 class ProductRetrieveUpdateView(RetrieveUpdateDestroyAPIView):
     """Handles retriving a single product"""
@@ -58,9 +61,30 @@ class CartView(ListCreateAPIView):
     def perform_create(self, serializer, product):
         serializer.save(user=self.request.user,product=product)
 
-class Cart(ListAPIView):
+class CartProducts(ListAPIView):
     serializer_class = CartSerializer
-    permission_classes = (AllowAny,)
-    queryset = Cart.objects.all()
+    permission_classes = (IsAuthenticated,)
+   
+
+    def get_queryset(self,request):
+        products = Cart.objects.filter(user=request.user) 
+
+        products_amount=products.values("product__price")
+        print(products_amount)
+        total_amount = lambda x : sum([float(data['product__price']) for data in x])
+
+        return products, total_amount(products_amount)
+
+    def get(self,request):
+        data = self.get_queryset(request)
+        serializer = self.serializer_class(data[0], many=True)
+        if data:
+            payload={'data':serializer.data,
+                    'Total Price':data[1],
+
+                    }
+            return Response(payload, status=status.HTTP_200_OK) 
+        else:
+            return Response({'message': 'Requested resources that does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
 
