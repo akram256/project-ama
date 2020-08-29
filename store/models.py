@@ -36,3 +36,9 @@ class Store(BaseAbstractModel):
     @property
     def product_category(self):
         return self.category.name
+
+
+class Cart(BaseAbstractModel):
+    product=models.ForeignKey(Store,
+                                on_delete=models.CASCADE)
+    # total_price=models.DecimalField(max_digits=12, decimal_places=2, null=True, default=Decimal('0.00'))

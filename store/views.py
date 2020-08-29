@@ -11,8 +11,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser, AllowAny,IsAuthenticated
 
-from .models import ProductCategory, Store
-from .serializers import ProductCategorySerializer,StoreSerializer
+from .models import ProductCategory, Store,Cart
+from .serializers import ProductCategorySerializer,StoreSerializer,CartSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -40,3 +40,33 @@ class ProductRetrieveUpdateView(RetrieveUpdateDestroyAPIView):
     def get_object(self):
         return get_object_or_404(
             self.get_queryset(), id=self.kwargs.get('id'))
+            
+
+class CartView(ListCreateAPIView):
+    serializer_class = CartSerializer
+    permission_classes = (AllowAny,)
+    queryset = Cart.objects.all()
+
+
+    def create(self, request, *args, **kwargs):
+        product = get_object_or_404(Store, id=self.kwargs.get('id'))
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        instance = Cart.objects.filter(
+            product=product.id)
+        if instance:
+            return Response({"message": "Product already added"},
+                            status=status.HTTP_200_OK)
+
+        self.perform_create(serializer,product)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def perform_create(self, serializer, product):
+        serializer.save(product=product)
+
+class Cart(ListAPIView):
+    serializer_class = CartSerializer
+    permission_classes = (AllowAny,)
+    queryset = Cart.objects.all()
+
+
