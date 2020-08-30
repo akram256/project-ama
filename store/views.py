@@ -70,7 +70,6 @@ class CartProducts(ListAPIView):
         products = Cart.objects.filter(user=request.user) 
 
         products_amount=products.values("product__price")
-        print(products_amount)
         total_amount = lambda x : sum([float(data['product__price']) for data in x])
 
         return products, total_amount(products_amount)
