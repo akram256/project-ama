@@ -55,8 +55,15 @@ class CartView(ListCreateAPIView):
         product = get_object_or_404(Store, id=self.kwargs.get('id'))
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
+        instance = Cart.objects.filter(
+            product=product.id, user=request.user.id)
+        if instance:
+            count= instance.count() + 1
         self.perform_create(serializer,product)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response({
+        "data":serializer.data,
+        "count":count},
+        status=status.HTTP_201_CREATED)
 
     def perform_create(self, serializer, product):
         serializer.save(user=self.request.user,product=product)
