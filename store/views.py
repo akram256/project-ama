@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404
 
 from rest_framework import serializers
 from rest_framework import viewsets
-from rest_framework.generics import ListCreateAPIView,ListAPIView,RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListCreateAPIView,ListAPIView,RetrieveUpdateDestroyAPIView,DestroyAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser, AllowAny,IsAuthenticated
@@ -55,8 +55,15 @@ class CartView(ListCreateAPIView):
         product = get_object_or_404(Store, id=self.kwargs.get('id'))
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
+        instance = Cart.objects.filter(
+            product=product.id, user=request.user.id)
+        if instance:
+            count= instance.count() + 1
         self.perform_create(serializer,product)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response({
+        "data":serializer.data,
+        "count":count},
+        status=status.HTTP_201_CREATED)
 
     def perform_create(self, serializer, product):
         serializer.save(user=self.request.user,product=product)
@@ -70,7 +77,6 @@ class CartProducts(ListAPIView):
         products = Cart.objects.filter(user=request.user) 
 
         products_amount=products.values("product__price")
-        print(products_amount)
         total_amount = lambda x : sum([float(data['product__price']) for data in x])
 
         return products, total_amount(products_amount)
@@ -88,3 +94,19 @@ class CartProducts(ListAPIView):
             return Response({'message': 'Requested resources that does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+
+class RemoveFromCartView(DestroyAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = CartSerializer
+    lookup_field = 'id'
+    queryset = Cart.objects.all()
+
+    def get_object(self):
+        return get_object_or_404(
+            self.get_queryset(), id=self.kwargs.get('id'))
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response({"message": "Product has been successfully removed"},
+                        status=status.HTTP_204_NO_CONTENT)
