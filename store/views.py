@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404
 
 from rest_framework import serializers
 from rest_framework import viewsets
-from rest_framework.generics import ListCreateAPIView,ListAPIView,RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListCreateAPIView,ListAPIView,RetrieveUpdateDestroyAPIView,DestroyAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser, AllowAny,IsAuthenticated
@@ -88,3 +88,19 @@ class CartProducts(ListAPIView):
             return Response({'message': 'Requested resources that does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+
+class RemoveFromCartView(DestroyAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = CartSerializer
+    lookup_field = 'id'
+    queryset = Cart.objects.all()
+
+    def get_object(self):
+        return get_object_or_404(
+            self.get_queryset(), id=self.kwargs.get('id'))
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response({"message": "Product has been successfully removed"},
+                        status=status.HTTP_204_NO_CONTENT)
