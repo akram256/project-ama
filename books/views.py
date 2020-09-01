@@ -34,17 +34,6 @@ class BookView(ListAPIView):
         return Response({"message":"Book has been  successfully Input"},
                         status=status.HTTP_201_CREATED)
 
-class BookRetrieveUpdateView(RetrieveUpdateDestroyAPIView):
-    """Handles retriving a single book"""
-    permission_classes =(AllowAny,)
-    serializer_class = BookSerializer
-    lookup_field = 'id'
-    queryset = BookModel.objects.all()
-
-    def get_object(self):
-        return get_object_or_404(
-            self.get_queryset(), id=self.kwargs.get('id'))
-
 
 class BookClassView(ListAPIView):
     """"implements categories of books"""
@@ -247,3 +236,16 @@ class FeedBackView(ListAPIView):
         serializer.save(user=request.user)
         return Response({"message":"Thank you for the feedback, We appreciate "},
                         status=status.HTTP_201_CREATED)            
+                        
+
+
+class BookRetrieveUpdateView(RetrieveUpdateDestroyAPIView):
+    """Handles retriving a single book"""
+    permission_classes =(AllowAny,)
+    serializer_class = BookSerializer
+    lookup_field = 'id'
+    queryset = BookModel.objects.all()
+
+    def get_object(self):
+        return get_object_or_404(
+            self.get_queryset(), id=self.kwargs.get('id'))
