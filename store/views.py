@@ -57,12 +57,17 @@ class CartView(ListCreateAPIView):
         serializer.is_valid(raise_exception=True)
         instance = Cart.objects.filter(
             product=product.id, user=request.user.id)
-        if instance:
-            count= instance.count() + 1
+        # if instance:
+        #     count= instance.count() + 1
+            # for object in instance:
+            #     # count= object.count() + 1
+            #     object.counter=count
+            #     object.save()
         self.perform_create(serializer,product)
         return Response({
         "data":serializer.data,
-        "count":count},
+        # "count":count
+        },
         status=status.HTTP_201_CREATED)
 
     def perform_create(self, serializer, product):
