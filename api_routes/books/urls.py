@@ -19,7 +19,7 @@ urlpatterns = [
             manager=LikeDislikeManager),
         name='books_dislike'),
 
-    path('books/category',BookCategoryView.as_view(),name='books-category'),
+    path('category',BookCategoryView.as_view(),name='books-category'),
     path("books/<str:id>/rate/", RatingsView.as_view(), name="rating"),
     path("book/class/category", BookClassView.as_view(), name='book-class-category'),
     path('books/<str:id>/bookmark/', BookmarkView.as_view(),
