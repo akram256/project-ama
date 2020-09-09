@@ -182,6 +182,26 @@ class AgeCategoryView(ListAPIView):
         serializer.save()
         return Response({"message":"Age category  has been  successfully Input"},
                         status=status.HTTP_201_CREATED)
+                        
+class UpdateAge(RetrieveUpdateDestroyAPIView):
+    permission_classes =(AllowAny,)
+    serializer_class = AgeSerializer
+    lookup_field = 'id'
+    queryset = Age_Category.objects.all()
+
+    def get_object(self):
+        return get_object_or_404(
+            self.get_queryset(), id=self.kwargs.get('id'))
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data,
+                                         partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response({'message':'Age category has Successfully updated',
+            'data':serializer.data},status=status.HTTP_200_OK)
 
 
 class UserProfileView(RetrieveUpdateDestroyAPIView):
