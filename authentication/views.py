@@ -2,6 +2,7 @@ import os
 import secrets
 import re
 import requests
+import uuid 
 import jwt
 import json
 import logging
@@ -90,7 +91,8 @@ class RegistrationAPIView(generics.GenericAPIView):
             user.set_password(password)
             user.save()
             UserProfile.objects.create(user=user) 
-            profile= UserProfile.objects.get(user=user)   
+            profile= UserProfile.objects.get(user=user) 
+            print(profile.svg_code)  
             email_verification_url=reverse('authentication:verify')
             full_url= request.build_absolute_uri(email_verification_url + '?token='+user.token)
             email_data = {'subject':'Welcome To Africa My Africa','email_from':settings.EMAIL_FROM}
@@ -107,6 +109,19 @@ class RegistrationAPIView(generics.GenericAPIView):
                     'last_name':user.last_name,
                     'email':user.email,}, status=status.HTTP_200_OK)
         return Response({'message': "Invalid credentials", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class Generate_Code(ListAPIView):
+    # serializer_class = RegistrationSerializer
+    permission_class = (IsAuthenticated,)
+    def post(self,request):
+        user= User.objects.filter(first_name=request.user)
+        print(user[0])
+        code = uuid.uuid4().hex[:6].upper()
+        # user[0].token=code
+        link = user[0].first_name + str(code)
+        return Response({"Code":link}, status=status.HTTP_201_CREATED)
+
 
 # class SchoolRegistrationAPIView(generics.GenericAPIView):
 #     """Register new users."""

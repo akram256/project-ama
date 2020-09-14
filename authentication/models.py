@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser,PermissionsMixin
 from utils.models import BaseAbstractModel
 from .managers import UserManager
+from django_robohash.robotmaker import make_robot_svg
 import uuid
 import jwt
 from datetime import datetime, timedelta
@@ -22,6 +23,7 @@ class User(AbstractBaseUser, PermissionsMixin, BaseAbstractModel):
     school_name = models.CharField(max_length=255, blank=True, null=True)
     school_address= models.CharField(max_length=255, blank=True, null=True)
     email = models.EmailField(blank=True,unique=True, null=True)
+    code=models.CharField(max_length=255, blank=True, null=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
@@ -54,7 +56,8 @@ class UserProfile(BaseAbstractModel):
     """User Profile Model"""
 
     user = models.OneToOneField(to='User', on_delete=models.CASCADE)
-    image=  models.CharField(max_length=255, blank=True, null=True)
+    svg_code = make_robot_svg("my string", width=300, height=300)
+    # image=  models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return "{}".format(self.user)
