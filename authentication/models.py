@@ -12,7 +12,7 @@ class User(AbstractBaseUser, PermissionsMixin, BaseAbstractModel):
     """This is a user model """
     ROLES = (
         ('SCHOOL', 'SCHOOL'),
-        ('USER', 'USER')
+        ('READER', 'READER')
     )
    
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

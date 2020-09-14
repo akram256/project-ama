@@ -44,6 +44,7 @@ class Cart(BaseAbstractModel):
     product=models.ForeignKey(Store,
                                 on_delete=models.CASCADE)
     user = models.ForeignKey(User, blank=False, on_delete=models.CASCADE)
+    counter=models.IntegerField(blank=True, null=True, default=0)
     
     def __str__(self):
         return str(self.product)

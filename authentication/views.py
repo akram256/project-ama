@@ -59,6 +59,7 @@ class RegistrationAPIView(generics.GenericAPIView):
         email = request.data.get('email')
         first_name=request.data.get('first_name')
         last_name=request.data.get('last_name')
+        role=request.data.get('role')
         email= str(email)
         email = email.lower()
         email_pattern = services.EMAIL_PATTERN
@@ -82,7 +83,10 @@ class RegistrationAPIView(generics.GenericAPIView):
         else:
             return Response({'message':'Email: {} is not valid'.format(email),}, status=status.HTTP_400_BAD_REQUEST)
         if serializer.is_valid(raise_exception=True):
-            user=User(email=email,password=password,first_name=first_name,last_name=last_name,role='USER',is_new_user=True)
+            # if role == "USER":
+            user=User(email=email,password=password,first_name=first_name,last_name=last_name,role=role,is_new_user=True)
+            # else:
+            #     user=User(email=email,password=password,first_name=first_name,last_name=last_name,role='SCHOOL',is_new_user=True)
             user.set_password(password)
             user.save()
             UserProfile.objects.create(user=user) 
@@ -103,6 +107,65 @@ class RegistrationAPIView(generics.GenericAPIView):
                     'last_name':user.last_name,
                     'email':user.email,}, status=status.HTTP_200_OK)
         return Response({'message': "Invalid credentials", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
+
+# class SchoolRegistrationAPIView(generics.GenericAPIView):
+#     """Register new users."""
+#     serializer_class = RegistrationSerializer
+#     permission_class = (AllowAny,)
+
+#     def post(self, request):
+#         users = User.objects.all()
+#         serializer = self.serializer_class(data=request.data)
+#         password = request.data.get('password')
+#         email = request.data.get('email')
+#         # school_name=request.data.get('school_name')
+#         # school_address=request.data.get('school_name')
+#         first_name=request.data.get('first_name')
+#         last_name=request.data.get('last_name')
+#         email= str(email)
+#         email = email.lower()
+#         email_pattern = services.EMAIL_PATTERN
+#         password_pattern = services.PASSWORD_PATTERN
+#         url_param = get_current_site(request).domain
+#         cache_key = email
+#         print(cache.get(cache_key))
+#         if cache.get(cache_key):
+          
+#             return Response({'message': f"Please visit your email {email} to complete registration", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
+
+#         if not re.match(password_pattern,password):
+#             return Response({'message':'Password is weak, please use atleast 1 UPPERCASE, 1 LOWERCASE, 1 SYMBOL',}, status=status.HTTP_400_BAD_REQUEST)
+        
+#         if re.match(email_pattern,email):
+#             user = [i for i in users if i.email == email]
+#             if user:
+#                 return Response({'message':'This email: {} , already belongs to a user on ama'.format(email),}, status=status.HTTP_400_BAD_REQUEST)
+#             else:
+#                 logger.info('email looks good')
+#         else:
+#             return Response({'message':'Email: {} is not valid'.format(email),}, status=status.HTTP_400_BAD_REQUEST)
+#         if serializer.is_valid(raise_exception=True):
+#             user=User(email=email,password=password,first_name=first_name,last_name=last_name,role='SCHOOL',is_new_user=True)
+#             user.set_password(password)
+#             user.save()
+#             UserProfile.objects.create(user=user) 
+#             profile= UserProfile.objects.get(user=user)   
+#             email_verification_url=reverse('authentication:verify')
+#             full_url= request.build_absolute_uri(email_verification_url + '?token='+user.token)
+#             email_data = {'subject':'Welcome To Africa My Africa','email_from':settings.EMAIL_FROM}
+#             content = render_to_string('activate_account.html',{'token':'{}'.format(full_url),} )
+#             send_user_email.delay(email,content,**email_data)
+
+#             details = {'field':'auth','password':password,'email':email}
+#             logger.info(f'user {email} has been registered')
+#             return Response({'message': "Registration successful, Kindly check your email to activate your account", 'status': '00','token':user.token, 
+#             # Kindly Check your email for complete the registration
+#                     'user_id':user.id,
+#                     'profile_id':profile.id,
+#                     'first_name':user.school_name,
+#                     'school_address':user.school_address,
+#                     'email':user.email,}, status=status.HTTP_200_OK)
+#         return Response({'message': "Invalid credentials", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class VerifyAccount(APIView):
@@ -132,10 +195,10 @@ class LoginAPIView(APIView):
         email = request.data.get('email')
         password = request.data.get('password')
         # new_user=User.objects.filter(email=email, is_new_user=True)
-        # print(new_user)
+        print(password)
         # if new_user.exists():
         if serializer.is_valid(raise_exception=True):
-        
+            
             user = authenticate(email=email, password=password) 
             # if user.
             if user is None:
