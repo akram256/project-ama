@@ -11,12 +11,14 @@ from .serializers import PaypalSerializer
 # Create your views here.
 
 class Payment(ListAPIView):
+    serializer_class=PaypalSerializer
     permission_classes = (IsAuthenticated,)
     def post(self, request):
         serializer = PaypalSerializer(data=request.data)
-        print(serializer.is_valid())
+        # print(serializer.is_valid())
+        # print(request.data)
         if serializer.is_valid():
-            resp = PayPalPayment.Payment(product=request.data.get('product'))
+            resp = PayPalPayment.Payment()
             status = resp.get('status')
             checkout_url = resp.get("data").get("authorization_url")
             message = (resp.get('message'))

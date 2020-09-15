@@ -107,7 +107,8 @@ class RegistrationAPIView(generics.GenericAPIView):
                     'profile_id':profile.id,
                     'first_name':user.first_name,
                     'last_name':user.last_name,
-                    'email':user.email,}, status=status.HTTP_200_OK)
+                    'email':user.email,
+                    'role':user.role}, status=status.HTTP_200_OK)
         return Response({'message': "Invalid credentials", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -237,6 +238,7 @@ class LoginAPIView(APIView):
                     'last_name':user.last_name,
                     'email':user.email,
                     'is_new_user':user.is_new_user,
+                    'role':user.role,
 
                     'message':'user loggedin successfully'
                 }
