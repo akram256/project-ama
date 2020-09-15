@@ -3,6 +3,8 @@ import logging
 from django.shortcuts import render
 from django.conf import settings
 from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
+
 
 from rest_framework import serializers
 from rest_framework import viewsets
@@ -16,6 +18,7 @@ from .serializers import BookSerializer,BookCategorySerializer,LikeDislikeSerial
 from authentication.models import User, UserProfile
 from django.contrib.contenttypes.models import ContentType
 from .models import LikeDislike
+from utils.tasks import send_user_email
 
 
 
@@ -234,6 +237,11 @@ class FeedBackView(ListAPIView):
         serializer = self.get_serializer(data=post_data)
         serializer.is_valid(raise_exception=True)
         serializer.save(user=request.user)
+        admin_email= settings.ADMIN_EMAIL 
+        template_data= {'player':request.user.first_name,'body':request.data["body"]}
+        content = render_to_string('feedback.html',template_data )
+        email_data = {'subject':'App Feedback','email_from':settings.EMAIL_FROM}
+        send_user_email.delay(admin_email,content,**email_data)
         return Response({"message":"Thank you for the feedback, We appreciate "},
                         status=status.HTTP_201_CREATED)            
                         

@@ -23,6 +23,7 @@ urlpatterns = [
     path('api/v1/', include('api_routes.auth.urls')),
     path('api/v1/', include('api_routes.books.urls')),
     path('api/v1/', include('api_routes.store.urls')),
+    path('api/v1/', include('api_routes.paypal.urls')),
 ]
 
 if settings.DEBUG:

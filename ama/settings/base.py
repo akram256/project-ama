@@ -42,11 +42,13 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'django_filters',
+    'django_robohash',
 
 
     'authentication.apps.AuthenticationConfig',
     'books',
     'store',
+    'paypal'
 ]
 
 MIDDLEWARE = [
@@ -121,23 +123,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# CELERY_BROKER_URL = 'redis://{}:{}'.format(os.environ.get('REDIS_HOST'), os.environ.get('REDIS_PORT'))
-# CELERY_RESULT_BACKEND = 'redis://{}:{}'.format(os.environ.get('REDIS_HOST'), os.environ.get('REDIS_PORT'))
-# CELERY_ACCEPT_CONTENT = ['application/json']
-# CELERY_RESULT_SERIALIZER = 'json'
-# CELERY_TASK_SERIALIZER = 'json'
-# CELERY_TIMEZONE = 'UTC'
-# CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 691200}
-# CELERY_ALWAYS_EAGER=False
-# TIME_ZONE = 'UTC'
-
-# REDIS_HOST = os.environ.get('REDIS_HOST'),
-# REDIS_PORT = os.environ.get('REDIS_PORT'),
-# CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
-
-# # for Heroku
-CELERY_BROKER_URL = os.environ.get('REDIS_URL')
-CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL')
+CELERY_BROKER_URL = 'redis://{}:{}'.format(os.environ.get('REDIS_HOST'), os.environ.get('REDIS_PORT'))
+CELERY_RESULT_BACKEND = 'redis://{}:{}'.format(os.environ.get('REDIS_HOST'), os.environ.get('REDIS_PORT'))
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
@@ -145,6 +132,21 @@ CELERY_TIMEZONE = 'UTC'
 CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 691200}
 CELERY_ALWAYS_EAGER=False
 TIME_ZONE = 'UTC'
+
+REDIS_HOST = os.environ.get('REDIS_HOST'),
+REDIS_PORT = os.environ.get('REDIS_PORT'),
+CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
+
+# # for Heroku
+# CELERY_BROKER_URL = os.environ.get('REDIS_URL')
+# CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL')
+# CELERY_ACCEPT_CONTENT = ['application/json']
+# CELERY_RESULT_SERIALIZER = 'json'
+# CELERY_TASK_SERIALIZER = 'json'
+# CELERY_TIMEZONE = 'UTC'
+# CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 691200}
+# CELERY_ALWAYS_EAGER=False
+# TIME_ZONE = 'UTC'
 
 
 
@@ -181,7 +183,6 @@ USE_L10N = True
 USE_TZ = True
 
 AUTH_USER_MODEL = 'authentication.User'
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
@@ -223,3 +224,8 @@ EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', '')
 EMAIL_SWITCH = os.environ.get('EMAIL_SWITCH', '')
 CACHE_TIME = int(os.environ.get('CACHE_TIME', '172800'))
 EMAIL_CACHE_TIME = int(os.environ.get('EMAIL_CACHE_TIME', '7200'))
+ADMIN_EMAIL =os.environ.get('ADMIN_EMAIL')
+CLIENT_ID= os.environ.get('CLIENT_ID')
+CLIENT_SECRET=os.environ.get('CLIENT_SECRET')
+
+
