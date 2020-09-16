@@ -119,13 +119,16 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
         instance.user.first_name = swap(user_data.get('first_name'), instance.user.first_name)
         instance.user.last_name = swap(user_data.get('last_name'), instance.user.last_name)
         instance.image= swap(validated_data.get('svg_code'),instance.svg_code)
+        instance.address= swap(validated_data.get('address'),instance.address)
+        instance.city= swap(validated_data.get('city'),instance.city)
+        instance.country= swap(validated_data.get('country'),instance.country)
         instance.user.save()
         instance.save()
         return instance
 
     class Meta:
         model=UserProfile
-        fields=['id','user','svg_code']
+        fields=['id','user', 'address', 'city','country','svg_code']
 
 
 class SubcriptionSerializer(serializers.Serializer):
