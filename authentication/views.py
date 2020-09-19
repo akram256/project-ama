@@ -117,7 +117,6 @@ class Generate_Code(ListAPIView):
     permission_class = (IsAuthenticated,)
     def post(self,request):
         user= User.objects.filter(first_name=request.user)
-        print(user[0])
         code = uuid.uuid4().hex[:6].upper()
         # user[0].token=code
         link = user[0].first_name + str(code)
