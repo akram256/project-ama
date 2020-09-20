@@ -119,7 +119,7 @@ class GenerateCodeView(ListAPIView):
         user= User.objects.filter(first_name=request.user)
         code = uuid.uuid4().hex[:6].upper()
         # user[0].token=code
-        link = user[0].first_name + str(code)
+        link = user[0].school_name + str(code)
         return Response({"Code":link}, status=status.HTTP_201_CREATED)
 
 
