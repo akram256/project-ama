@@ -112,8 +112,8 @@ class RegistrationAPIView(generics.GenericAPIView):
         return Response({'message': "Invalid credentials", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class Generate_Code(ListAPIView):
-    # serializer_class = RegistrationSerializer
+class GenerateCodeView(ListAPIView):
+    serializer_class = RegistrationSerializer
     permission_class = (IsAuthenticated,)
     def post(self,request):
         user= User.objects.filter(first_name=request.user)
