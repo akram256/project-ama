@@ -116,7 +116,7 @@ class GenerateCodeView(ListAPIView):
     serializer_class = RegistrationSerializer
     permission_class = (IsAuthenticated,)
     def post(self,request):
-        user= User.objects.filter(first_name=request.user)
+        user= User.objects.filter(school_name=request.user)
         code = uuid.uuid4().hex[:6].upper()
         # user[0].token=code
         link = user[0].school_name + str(code)
