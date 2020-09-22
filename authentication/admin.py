@@ -35,7 +35,7 @@ class ExportCsvMixin:
     export_as_csv.short_description = "Export as Csv"
 
 class CustomUserAdmin(UserAdmin, ExportCsvMixin):
-    list_display = ('id',  'email','first_name', 'last_name','role','school_name',
+    list_display = ('id',  'email','first_name', 'last_name','role','school_name','school_address',
                     'created_at')
     list_filter = ('created_at','is_active', 'is_staff')
     search_fields = ('email',)
@@ -50,12 +50,6 @@ admin.site.register(User, CustomUserAdmin)
 admin.site.register(Age_Category)
 admin.site.register(UserProfile)
 
-
-# @admin.register(School)
-# class SchoolAdmin(admin.ModelAdmin):
-#     list_display = ('school_email','school_name','school_address',)
-#     # list_filter = ( ('created_at',DateRangeFilter),)
-#     search_fields = ('created_at','school_email','school_name')
 
 admin.site.site_header = "AMA Admin Portal"
 admin.site.site_title = "AMA Admin Portal"

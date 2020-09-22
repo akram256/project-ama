@@ -60,6 +60,8 @@ class RegistrationAPIView(generics.GenericAPIView):
         email = request.data.get('email')
         first_name=request.data.get('first_name')
         last_name=request.data.get('last_name')
+        school_name=request.data.get('school_name')
+        school_address=request.data.get('school_address')
         role=request.data.get('role')
         email= str(email)
         email = email.lower()
@@ -85,7 +87,7 @@ class RegistrationAPIView(generics.GenericAPIView):
             return Response({'message':'Email: {} is not valid'.format(email),}, status=status.HTTP_400_BAD_REQUEST)
         if serializer.is_valid(raise_exception=True):
             # if role == "USER":
-            user=User(email=email,password=password,first_name=first_name,last_name=last_name,role=role,is_new_user=True)
+            user=User(email=email,password=password,first_name=first_name,last_name=last_name,school_name=school_name,school_address=school_address,role=role,is_new_user=True)
             # else:
             #     user=User(email=email,password=password,first_name=first_name,last_name=last_name,role='SCHOOL',is_new_user=True)
             user.set_password(password)
@@ -108,6 +110,8 @@ class RegistrationAPIView(generics.GenericAPIView):
                     'first_name':user.first_name,
                     'last_name':user.last_name,
                     'email':user.email,
+                    "school_name":user.school_name,
+                     "school_address":user.school_address,
                     'role':user.role}, status=status.HTTP_200_OK)
         return Response({'message': "Invalid credentials", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -167,6 +171,8 @@ class LoginAPIView(APIView):
                     'email':user.email,
                     'is_new_user':user.is_new_user,
                     'role':user.role,
+                    'school_name':user.school_name,
+                    'school_address':user.school_address,
 
                     'message':'user loggedin successfully'
                 }
