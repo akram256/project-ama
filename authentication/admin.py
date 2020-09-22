@@ -35,7 +35,7 @@ class ExportCsvMixin:
     export_as_csv.short_description = "Export as Csv"
 
 class CustomUserAdmin(UserAdmin, ExportCsvMixin):
-    list_display = ('id',  'email','first_name', 'last_name','role',
+    list_display = ('id',  'email','first_name', 'last_name','role','school_name',
                     'created_at')
     list_filter = ('created_at','is_active', 'is_staff')
     search_fields = ('email',)
