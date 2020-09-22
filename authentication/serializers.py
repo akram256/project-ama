@@ -80,6 +80,13 @@ class RegistrationSerializer(serializers.Serializer):
         return password1 == password2
 
 
+class GenerateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "school_name",]
+
+
+
 class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=128, write_only=True)
     # Ignore these fields if they are included in the request.

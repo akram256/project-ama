@@ -36,7 +36,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import ListAPIView,RetrieveUpdateDestroyAPIView,ListCreateAPIView,RetrieveUpdateAPIView
 from rest_framework.views import APIView
 
-from .serializers import RegistrationSerializer,LoginSerializer,AgeSerializer,UpdateProfileSerializer,SubcriptionSerializer,VerifySubscriptionSerializer
+from .serializers import RegistrationSerializer,GenerateSerializer,LoginSerializer,AgeSerializer,UpdateProfileSerializer,SubcriptionSerializer,VerifySubscriptionSerializer
 # ,SchoolRegistrationSerializer,SchoolLoginSerializer
 from authentication.models import User,Age_Category,UserProfile
 # , School
@@ -110,17 +110,6 @@ class RegistrationAPIView(generics.GenericAPIView):
                     'email':user.email,
                     'role':user.role}, status=status.HTTP_200_OK)
         return Response({'message': "Invalid credentials", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
-
-
-class GenerateCodeView(ListAPIView):
-    serializer_class = RegistrationSerializer
-    permission_class = (IsAuthenticated,)
-    def post(self,request):
-        user= User.objects.filter(school_name=request.user)
-        code = uuid.uuid4().hex[:6].upper()
-        # user[0].token=code
-        link = user[0].school_name + str(code)
-        return Response({"Code":link}, status=status.HTTP_201_CREATED)
 
 
 class VerifyAccount(APIView):
@@ -290,6 +279,23 @@ class UpdateProfile(APIView):
             serializer.save()
             return Response({'message':'user profile updated','status':'00','data':serializer.data}, status=status.HTTP_200_OK)
         return Response({'message': "Invalid credentials", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class GenerateCodeView(ListAPIView):
+    serializer_class = GenerateSerializer
+    permission_class = (IsAuthenticated,)
+    def post(self,request):
+        post_data = {"school_name":request.data["school_name"]}
+        serializer = self.get_serializer(data=post_data)
+        
+        if serializer.is_valid(raise_exception=True):
+            user= User.objects.filter(school_name=request.user)
+            code = uuid.uuid4().hex[:6].upper()
+            # user[0].token=code
+            link = user[0].school_name + str(code)
+            return Response({"Code":link}, status=status.HTTP_201_CREATED)
+        return Response({'message': "Error", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
+        
 
 
 class AddSubscription(APIView):
