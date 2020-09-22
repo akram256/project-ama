@@ -291,16 +291,10 @@ class GenerateCodeView(ListAPIView):
     serializer_class = GenerateSerializer
     permission_class = (IsAuthenticated,)
     def post(self,request):
-        # post_data = {"school_name":request.data["school_name"]}
-        # serializer = self.get_serializer(data=post_data)
-        
-        # if serializer.is_valid(raise_exception=True):
         user= User.objects.filter(id=request.user.id)
         code = uuid.uuid4().hex[:6].upper()
-        # user[0].token=code
         link = user[0].school_name + str(code)
         return Response({"Code":link}, status=status.HTTP_201_CREATED)
-        # return Response({'message': "Error", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
         
 
 
