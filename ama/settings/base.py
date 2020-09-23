@@ -227,5 +227,6 @@ EMAIL_CACHE_TIME = int(os.environ.get('EMAIL_CACHE_TIME', '7200'))
 ADMIN_EMAIL =os.environ.get('ADMIN_EMAIL')
 CLIENT_ID= os.environ.get('CLIENT_ID')
 CLIENT_SECRET=os.environ.get('CLIENT_SECRET')
+REDIRECT_URL=os.environ.get('REDIRECT_URL')
 
 
