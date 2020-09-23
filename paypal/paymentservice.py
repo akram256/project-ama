@@ -78,7 +78,7 @@ class PayPalPayment:
             }],
             "note_to_payer": "Contact us for any questions on your order.",
             "redirect_urls": {
-            "return_url": "http://c9df060f00b0.ngrok.io/api/v1/approval/payment",
+            "return_url": settings.REDIRECT_URL,
             "cancel_url": "http://c9df060f00b0.ngrok.io/api/v1/"
             }
             
