@@ -8,6 +8,8 @@ import json
 import logging
 from datetime import timedelta, datetime, time, date
 from decimal import Decimal
+from decimal import Decimal
+import avinit
 
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.cache import cache
@@ -258,9 +260,11 @@ class UpdateProfile(APIView):
         first_name = request.data['user']['first_name']
         last_name=request.data['user']['first_name']
         email = request.data['user']['email']
-        address = request.data['address']
-        city= request.data['city']
-        country=request.data['country']
+        # avatar=avinit.get_avatar_data_url(first_name)
+        # print(avatar)
+        # address = request.data['address']
+        # city= request.data['city']
+        # country=request.data['country']
         try:
             image=request.data['image']
         except:
@@ -281,7 +285,14 @@ class UpdateProfile(APIView):
             rdata['user']['email'] = ''
       
         serializer = self.serializer_class(userprofile, data=request.data)
+       
+        userprofile.save()
         if serializer.is_valid(raise_exception=True):
+            avatar=avinit.get_avatar_data_url(first_name)
+            # print(avatar)
+            userprofile.image=avatar
+            print(avatar, 'hetete')
+          
             serializer.save()
             return Response({'message':'user profile updated','status':'00','data':serializer.data}, status=status.HTTP_200_OK)
         return Response({'message': "Invalid credentials", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
@@ -291,16 +302,10 @@ class GenerateCodeView(ListAPIView):
     serializer_class = GenerateSerializer
     permission_class = (IsAuthenticated,)
     def post(self,request):
-        # post_data = {"school_name":request.data["school_name"]}
-        # serializer = self.get_serializer(data=post_data)
-        
-        # if serializer.is_valid(raise_exception=True):
         user= User.objects.filter(id=request.user.id)
         code = uuid.uuid4().hex[:6].upper()
-        # user[0].token=code
         link = user[0].school_name + str(code)
         return Response({"Code":link}, status=status.HTTP_201_CREATED)
-        # return Response({'message': "Error", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
         
 
 

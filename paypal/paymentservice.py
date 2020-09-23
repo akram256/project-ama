@@ -41,28 +41,28 @@ class PayPalPayment:
             # "payment_options": {
             #     "allowed_payment_method": "INSTANT_FUNDING_SOURCE"
             # },
-            # "soft_descriptor": "ECHI5786786",
-            # "item_list": {
-            #     "items": [{
-            #     "name": product,
-            #     "description": "Brown color hat",
-            #     "quantity": "5",
-            #     "price": price,
-            #     # "tax": "0.01",
-            #     # "sku": "1",
-            #     "currency": "USD"
-            #     }
-            #     ],
-            #     # , 
-            #     # {
-            #     # "name": "handbag",
-            #     # "description": "Black color hand bag",
-            #     # "quantity": "1",
-            #     # "price": "15",
-            #     # "tax": "0.02",
-            #     # "sku": "product34",
-            #     # "currency": "USD"
-            #     # }
+            "item_list": {
+                "items": [{
+                "name": "product",
+                # "description": "Brown color hat",
+                "quantity": "5",
+                "price": "500",
+                # "tax": "0.01",
+                # "sku": "1",
+                "currency": "USD"
+                }
+                   , 
+                {
+                "name": "handbag",
+                "description": "Black color hand bag",
+                "quantity": "1",
+                "price": "500",
+                # "tax": "0.02",
+                # "sku": "product34",
+                "currency": "USD"
+                }
+                ]},
+             
                 
             #     # "shipping_address": {
             #     # "recipient_name": "Hello World",data":json.dumps(data)

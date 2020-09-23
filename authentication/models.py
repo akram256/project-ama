@@ -8,6 +8,7 @@ import jwt
 from datetime import datetime, timedelta
 from django.conf import settings
 from decimal import Decimal
+import avinit
 
 class User(AbstractBaseUser, PermissionsMixin, BaseAbstractModel):
     """This is a user model """
@@ -56,7 +57,8 @@ class UserProfile(BaseAbstractModel):
     """User Profile Model"""
 
     user = models.OneToOneField(to='User', on_delete=models.CASCADE)
-    svg_code = make_robot_svg("my string", width=300, height=300)
+    # svg_code = make_robot_svg("my string", width=300, height=300)
+    image=models.CharField(max_length=1000, blank=True, null=True)
     address=models.CharField(max_length=255, blank=True, null=True)
     city=  models.CharField(max_length=255, blank=True, null=True)
     country= models.CharField(max_length=255, blank=True, null=True)
