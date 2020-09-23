@@ -20,18 +20,18 @@ class Payment(ListAPIView):
     serializer_class=PaypalSerializer
     permission_classes = (IsAuthenticated,)
     def post(self, request):
+        # cart_products=Cart.objects.filter(user=request.user)
+        # print(cart_products.product_name)
         post_data = {"price":request.data["price"],"product":request.data["product"]}
         serializer = self.get_serializer(data=post_data)
         print(serializer.is_valid())
         if serializer.is_valid():
-            resp = PayPalPayment.Payment(price= post_data['price'],product= post_data['product'])
-
+            resp = PayPalPayment.Payment(price= post_data['price'],product= post_data["product"])
             state=resp ["state"]
             checkout_url = resp ["links"][1]
             payID=resp["id"]
             PayPalPayment.approve_payment(payid=payID, payer_id="84XWDTVS959S8")
             if state == "created":
-                
                 
                  return Response({'approval-url':checkout_url, 
                                   'ID':payID
