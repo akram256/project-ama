@@ -95,8 +95,7 @@ class RegistrationAPIView(generics.GenericAPIView):
             user.set_password(password)
             user.save()
             UserProfile.objects.create(user=user) 
-            profile= UserProfile.objects.get(user=user) 
-            print(profile.svg_code)  
+            profile= UserProfile.objects.get(user=user)
             email_verification_url=reverse('authentication:verify')
             full_url= request.build_absolute_uri(email_verification_url + '?token='+user.token)
             email_data = {'subject':'Welcome To Africa My Africa','email_from':settings.EMAIL_FROM}
@@ -288,7 +287,8 @@ class UpdateProfile(APIView):
        
         userprofile.save()
         if serializer.is_valid(raise_exception=True):
-            avatar=avinit.get_avatar_data_url(first_name)
+            full_name=str(first_name + last_name)
+            avatar=avinit.get_avatar_data_url(full_name)
             # print(avatar)
             userprofile.image=avatar
             print(avatar, 'hetete')
