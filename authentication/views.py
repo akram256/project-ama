@@ -99,8 +99,6 @@ class RegistrationAPIView(generics.GenericAPIView):
             avatar=avinit.get_avatar_data_url(full_name)
             profile.image=avatar
             profile.save()
-            print(profile.image)
-            print(avatar, 'hetete')
             email_verification_url=reverse('authentication:verify')
             full_url= request.build_absolute_uri(email_verification_url + '?token='+user.token)
             email_data = {'subject':'Welcome To Africa My Africa','email_from':settings.EMAIL_FROM}
