@@ -64,6 +64,13 @@ class UserProfile(BaseAbstractModel):
     country= models.CharField(max_length=255, blank=True, null=True)
 
 
+    # full_name=str(first_name + last_name)
+    # avatar=avinit.get_avatar_data_url(full_name)
+    # # # print(avatar)
+    # userprofile.image=avatar
+    # print(avatar, 'hetete')
+
+
     def __str__(self):
         return "{}".format(self.user)
 

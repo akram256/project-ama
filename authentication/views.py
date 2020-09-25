@@ -71,7 +71,6 @@ class RegistrationAPIView(generics.GenericAPIView):
         password_pattern = services.PASSWORD_PATTERN
         url_param = get_current_site(request).domain
         cache_key = email
-        print(cache.get(cache_key))
         if cache.get(cache_key):
           
             return Response({'message': f"Please visit your email {email} to complete registration", 'status': '00'}, status=status.HTTP_400_BAD_REQUEST)
@@ -96,6 +95,12 @@ class RegistrationAPIView(generics.GenericAPIView):
             user.save()
             UserProfile.objects.create(user=user) 
             profile= UserProfile.objects.get(user=user)
+            full_name=str(first_name + last_name)
+            avatar=avinit.get_avatar_data_url(full_name)
+            profile.image=avatar
+            profile.save()
+            print(profile.image)
+            print(avatar, 'hetete')
             email_verification_url=reverse('authentication:verify')
             full_url= request.build_absolute_uri(email_verification_url + '?token='+user.token)
             email_data = {'subject':'Welcome To Africa My Africa','email_from':settings.EMAIL_FROM}
@@ -226,6 +231,12 @@ class UserProfileView(RetrieveUpdateDestroyAPIView):
     queryset=UserProfile.objects.all()
 
     def get_object(self):
+        
+        # full_name=str(first_name + last_name)
+        # avatar=avinit.get_avatar_data_url(full_name)
+        # # print(avatar)
+        # userprofile.image=avatar
+        # print(avatar, 'hetete')
         return get_object_or_404(
             self.get_queryset(), id=self.kwargs.get('id'))
 
