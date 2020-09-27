@@ -2,6 +2,8 @@ import requests
 
 from django.shortcuts import render
 from django.urls import reverse
+from django.template.loader import render_to_string
+from django.conf import settings
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -9,35 +11,38 @@ from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAdminUser, AllowAny,IsAuthenticated
 
 from .paymentservice import PayPalPayment
-from .serializers import PaypalSerializer,ApprovePaymentSerializer
+# from .serializers import PaypalSerializer,ApprovePaymentSerializer
 from store.models import Cart
-from store.serializers import CartSerializer
+from store.serializers import CartSerializer,PaymentCartSerializer
+from utils.tasks import send_user_email
 
 
 # Create your views here.
 
 class Payment(ListAPIView):
-    serializer_class=PaypalSerializer
+    serializer_class=PaymentCartSerializer
     permission_classes = (IsAuthenticated,)
+
     def post(self, request):
-        # cart_products=Cart.objects.filter(user=request.user)
-        # print(cart_products.product_name)
-        post_data = {"price":request.data["price"],"product":request.data["product"]}
-        serializer = self.get_serializer(data=post_data)
-        print(serializer.is_valid())
-        if serializer.is_valid():
-            resp = PayPalPayment.Payment(price= post_data['price'],product= post_data["product"])
+        products = Cart.objects.filter(user=request.user)
+        # serializer = self.serializer_class(products, many=True)
+        # print(serializer)
+        if products.exists():
+            products_amount=products.values("product__price")
+            total_amount = lambda x : sum([float(data['product__price']) for data in x])
+            resp = PayPalPayment.Payment(price= str(total_amount(products_amount)))
+            template_data={"price":str(total_amount(products_amount))}
+            email_data = {'subject':'Payment Details','email_from':settings.EMAIL_FROM}
+            content = render_to_string('paypal.html',template_data)
+            send_user_email.delay(request.user.email,content,**email_data)
+            products.delete()
             state=resp ["state"]
             checkout_url = resp ["links"][1]
-            payID=resp["id"]
-            PayPalPayment.approve_payment(payid=payID, payer_id="84XWDTVS959S8")
+          
             if state == "created":
-                
-                 return Response({'approval-url':checkout_url, 
-                                  'ID':payID
-                                  }, status=status.HTTP_201_CREATED)
-           
-        return Response({'error':"error"}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'approval-url':checkout_url, 
+                                    }, status=status.HTTP_201_CREATED)
+        return Response({'error':"This Transactions can not be completed. No Products in the cart at the moments"}, status=status.HTTP_400_BAD_REQUEST)
 
 class ApprovePaymentView(ListAPIView):
     permission_classes=(AllowAny,)

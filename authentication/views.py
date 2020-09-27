@@ -95,10 +95,10 @@ class RegistrationAPIView(generics.GenericAPIView):
             user.save()
             UserProfile.objects.create(user=user) 
             profile= UserProfile.objects.get(user=user)
-            full_name=str(first_name + last_name)
-            avatar=avinit.get_avatar_data_url(full_name)
-            profile.image=avatar
-            profile.save()
+            # full_name=str(first_name + last_name)
+            # avatar=avinit.get_avatar_data_url(full_name)
+            # profile.image=avatar
+            # profile.save()
             email_verification_url=reverse('authentication:verify')
             full_url= request.build_absolute_uri(email_verification_url + '?token='+user.token)
             email_data = {'subject':'Welcome To Africa My Africa','email_from':settings.EMAIL_FROM}
@@ -152,7 +152,6 @@ class LoginAPIView(APIView):
         if serializer.is_valid(raise_exception=True):
             
             user = authenticate(email=email, password=password) 
-            # if user.
             if user is None:
                 users = User.objects.all()
                 return Response ({'Invalid email or password'}, status=status.HTTP_400_BAD_REQUEST)

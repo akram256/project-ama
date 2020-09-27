@@ -10,13 +10,10 @@ logger = logging.getLogger(__name__)
 class PayPalPayment:
 
     @classmethod
-    def Payment(self,product, price):
+    def Payment(self, price):
         client_ID= settings.CLIENT_ID
         client_Secret=settings.CLIENT_SECRET
         
-        # if not product:id
-      
-        print(product)
         data={
             "intent": "sale",
             "payer": {
@@ -35,33 +32,33 @@ class PayPalPayment:
                 # "insurance": "0.01"
                 }
             },
-            # "description": "This is the payment transaction description.",
+            "description": "This is the payment AMA Products.",
             # # "custom": "EBAY_EMS_90048630024435",
             # # "invoice_number": "48787589673",
             # "payment_options": {
             #     "allowed_payment_method": "INSTANT_FUNDING_SOURCE"
-            # },
-            "item_list": {
-                "items": [{
-                "name": "product",
-                # "description": "Brown color hat",
-                "quantity": "5",
-                "price": "500",
-                # "tax": "0.01",
-                # "sku": "1",
-                "currency": "USD"
-                }
-                   , 
-                {
-                "name": "handbag",
-                "description": "Black color hand bag",
-                "quantity": "1",
-                "price": "500",
-                # "tax": "0.02",
-                # "sku": "product34",
-                "currency": "USD"
-                }
-                ]},
+            # # },
+            # "item_list": {
+            #     "items": [{
+            #     "name": "product",
+            #     # # "description": "Brown color hat",
+            #     "quantity": "5",
+            #     "price": "500",
+            #     # # "tax": "0.01",
+            #     # # "sku": "1",
+            #     "currency": "USD"
+            #     }
+            #        , 
+            #     {
+            #     "name": "handbag",
+            #     # "description": "Black color hand bag",
+            #     "quantity": "1",
+            #     "price": "500",
+            #     # # "tax": "0.02",
+            #     # # "sku": "product34",
+            #     "currency": "USD"
+            #     }
+            #     ]},
              
                 
             #     # "shipping_address": {
@@ -78,7 +75,8 @@ class PayPalPayment:
             }],
             "note_to_payer": "Contact us for any questions on your order.",
             "redirect_urls": {
-            "return_url": settings.REDIRECT_URL,
+            # "return_url": settings.PAYPAL_URL,
+            "return_url":  settings.PAYPAL_URL,
             "cancel_url": "http://c9df060f00b0.ngrok.io/api/v1/"
             }
             
