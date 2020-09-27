@@ -27,3 +27,17 @@ class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
         fields=("id","product_name",'price','specifications','image','variation','origin','counter',"created_at")
+
+
+class PaymentCartSerializer(serializers.ModelSerializer):
+    """Serializer for Cart"""
+
+    product_name = serializers.ReadOnlyField(source='product.product')
+    price = serializers.ReadOnlyField(source='product.price')
+    specifications = serializers.ReadOnlyField(source='product.specifications')
+    variation = serializers.ReadOnlyField(source='product.variation')
+    origin = serializers.ReadOnlyField(source='product.origin')
+    
+    class Meta:
+        model = Cart
+        fields=("product_name",'price','specifications','variation','origin')

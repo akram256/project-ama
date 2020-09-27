@@ -76,7 +76,7 @@ class PayPalPayment:
             "note_to_payer": "Contact us for any questions on your order.",
             "redirect_urls": {
             # "return_url": settings.PAYPAL_URL,
-            "return_url":"http://4b2f8d655cbe.ngrok.io/approval/payment",
+            "return_url":  settings.PAYPAL_URL,
             "cancel_url": "http://c9df060f00b0.ngrok.io/api/v1/"
             }
             

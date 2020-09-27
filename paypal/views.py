@@ -11,32 +11,35 @@ from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAdminUser, AllowAny,IsAuthenticated
 
 from .paymentservice import PayPalPayment
-from .serializers import PaypalSerializer,ApprovePaymentSerializer
+# from .serializers import PaypalSerializer,ApprovePaymentSerializer
 from store.models import Cart
-from store.serializers import CartSerializer
+from store.serializers import CartSerializer,PaymentCartSerializer
 from utils.tasks import send_user_email
 
 
 # Create your views here.
 
 class Payment(ListAPIView):
-    serializer_class=PaypalSerializer
+    serializer_class=PaymentCartSerializer
     permission_classes = (IsAuthenticated,)
+
     def post(self, request):
-        products = Cart.objects.filter(user=request.user) 
-        print(products)
+        products = Cart.objects.filter(user=request.user)
+        # serializer = self.serializer_class(products, many=True)
+        # print(serializer)
         if products.exists():
             products_amount=products.values("product__price")
             total_amount = lambda x : sum([float(data['product__price']) for data in x])
             resp = PayPalPayment.Payment(price= str(total_amount(products_amount)))
-            print(resp)
+            template_data={"price":str(total_amount(products_amount))}
+            email_data = {'subject':'Payment Details','email_from':settings.EMAIL_FROM}
+            content = render_to_string('paypal.html',template_data)
+            send_user_email.delay(request.user.email,content,**email_data)
             products.delete()
             state=resp ["state"]
             checkout_url = resp ["links"][1]
+          
             if state == "created":
-                    email_data = {'subject':'Payment Details','email_from':settings.EMAIL_FROM}
-                    content = render_to_string('paypal.html',)
-                    send_user_email.delay(request.user.email,content,**email_data)
                     return Response({'approval-url':checkout_url, 
                                     }, status=status.HTTP_201_CREATED)
         return Response({'error':"This Transactions can not be completed. No Products in the cart at the moments"}, status=status.HTTP_400_BAD_REQUEST)
