@@ -9,6 +9,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView
 from django.views.generic import TemplateView
+from django.http import HttpResponseRedirect
 from rest_framework.permissions import IsAdminUser, AllowAny,IsAuthenticated
 
 from .paymentservice import PayPalPayment
@@ -60,8 +61,8 @@ class ApprovePaymentView(ListAPIView):
         resp = PayPalPayment.approve_payment(payid=paymentid,payer_id=PayerID)
         state=resp ["state"]
         if state == "approved":
-            return Response({"message":"Payment Successful"})
-        return Response({"error": "error"}, status=status.HTTP_400_BAD_REQUEST)
+              return HttpResponseRedirect('https://ama256.herokuapp.com/api/v1/success/pay')
+        return Response({"error": "Kindly Check your PayPal Balance"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class SuccessView(TemplateView):
