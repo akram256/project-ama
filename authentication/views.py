@@ -38,7 +38,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import ListAPIView,RetrieveUpdateDestroyAPIView,ListCreateAPIView,RetrieveUpdateAPIView
 from rest_framework.views import APIView
 
-from .serializers import RegistrationSerializer,GenerateSerializer,LoginSerializer,AgeSerializer,UpdateProfileSerializer,SubcriptionSerializer,VerifySubscriptionSerializer
+from .serializers import RegistrationSerializer,PasswordResetConfirmSerializer,PasswordResetSerializer,GenerateSerializer,LoginSerializer,AgeSerializer,UpdateProfileSerializer,SubcriptionSerializer,VerifySubscriptionSerializer
 # ,SchoolRegistrationSerializer,SchoolLoginSerializer
 from authentication.models import User,Age_Category,UserProfile
 # , School
@@ -314,6 +314,84 @@ class GenerateCodeView(ListAPIView):
         code = uuid.uuid4().hex[:6].upper()
         link = user[0].school_name + str(code)
         return Response({"Code":link}, status=status.HTTP_201_CREATED)
+
+
+
+class ResetPasswordRequest(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = PasswordResetSerializer
+    def post(self, request,):
+        serializer_data =  {"email":request.data["email"]}
+        serializer = self.serializer_class(data=serializer_data)
+        serializer.is_valid(raise_exception=True)
+        user= User.objects.filter(email=request.data["email"])
+        if not user.exists():
+            return Response({'error':'This user with email {} does not exist on AMA'.format(request.data["email"])}, status=status.HTTP_404_NOT_FOUND)
+        reset_password_token = uuid.uuid4().hex[:6].upper()
+        template_data={"token":reset_password_token}
+        email_data = {'subject':'Password Reset','email_from':settings.EMAIL_FROM}
+        content = render_to_string('reset_password.html', template_data)
+        send_user_email.delay(user[0].email,content,**email_data)
+        resp = {
+                'status': '00',
+                'email':user[0].email,
+                'message':'Please check your email to reset password'
+            }
+       
+        return Response(resp, status=status.HTTP_200_OK)
+
+class ResetPasswordToken(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = PasswordResetSerializer
+    def post(self, request,):
+        serializer_data =  {"token":request.data["token"]}
+        serializer = self.serializer_class(data=serializer_data)
+        serializer.is_valid(raise_exception=True)
+        resp = {
+                'status': '00',
+                'email':token,
+                'message':'Token matches'
+            }
+       
+        return Response(resp, status=status.HTTP_200_OK)
+
+
+class ResetPasswordConfirm(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = PasswordResetConfirmSerializer
+    def get_object(self,email):
+        try:
+            return User.objects.get(email=email)
+        except:
+            return None
+
+    def post(self, request,):
+        serializer = self.serializer_class(data=request.data)
+        password1 = request.data.get('password')
+        password2 = request.data.get('confirm_password')
+        email = request.data.get('email')
+        user = self.get_object(email)
+        logger.info(email)
+        logger.info(user)
+        logger.info('after user')
+        if not user:
+            return Response({'message':'This email: {} does not belong to any user on lottoly'.format(email),}, status=status.HTTP_400_BAD_REQUEST)
+        pattern = services.PASSWORD_PATTERN
+        if serializer.is_valid():
+            if password1 != password2:
+                return Response({'message':'Password mismatch', 'status': '00'})
+            if re.match(pattern,password1):
+                user.set_password(password1)
+                user.save()
+                logger.info('user new password is {}'.format(password1))
+                return Response({'message':'Password ok, password reset', 'status': '00'})
+            else:
+                Response({'message':'bad password',}, status=status.HTTP_400_BAD_REQUEST)
+
+        
+        return Response({'message':'wrong field query',}, status=status.HTTP_400_BAD_REQUEST)
+
+
         
 
 

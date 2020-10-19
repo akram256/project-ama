@@ -1,5 +1,5 @@
 from django.urls import path, include
-from authentication.views import LoginAPIView,TestView,AddSubscription,VerifySubscriptionView,VerifyAccount,UserProfileView, RegistrationAPIView,UpdateProfile, AgeCategoryView,UpdateAge,GenerateCodeView
+from authentication.views import LoginAPIView,ResetPasswordRequest,ResetPasswordToken,ResetPasswordConfirm,TestView,AddSubscription,VerifySubscriptionView,VerifyAccount,UserProfileView, RegistrationAPIView,UpdateProfile, AgeCategoryView,UpdateAge,GenerateCodeView
 # ,SchoolRegistrationAPIView
 
 app_name= 'authentication'
@@ -18,8 +18,8 @@ urlpatterns = [
     path("verify/account", TestView.as_view(), name='verif-template'),
     path("update/age", UpdateAge.as_view(), name='update-age'),
     path("get/school/code", GenerateCodeView.as_view(), name='generate-code'),
-    
-    # path("school/login",SchoolLoginAPIView.as_view(),name='school-login')
-
+    path('resetpassword/request', ResetPasswordRequest.as_view(), name='password-reset-request'),
+    path('resetpassword/confirm', ResetPasswordConfirm.as_view(), name='password-reset-confirm'),
+    path('confirm/restpassword/token',ResetPasswordToken.as_view(),name='password-token-confirm')
 
 ]

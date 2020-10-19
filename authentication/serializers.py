@@ -85,7 +85,14 @@ class GenerateSerializer(serializers.ModelSerializer):
         model = User
         fields = ["id", "school_name",]
 
+class PasswordResetSerializer(serializers.Serializer):
+    email = serializers.CharField(max_length=255,write_only=True)
 
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    token = serializers.CharField(max_length=255, read_only=True)
+    password = serializers.CharField(max_length=128,write_only=True)
+    confirm_password = serializers.CharField(max_length=128,write_only=True)
+    email = serializers.CharField(max_length=255,write_only=True)
 
 class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=128, write_only=True)
