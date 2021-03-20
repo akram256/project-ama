@@ -43,7 +43,7 @@ google-auth-httplib2==0.0.3
 gunicorn==19.9.0
 idna==2.8
 itypes==1.1.0
-Jinja2==2.10.1
+Jinja2==2.11.3
 jmespath==0.9.4
 kombu==4.6.3
 logutils==0.3.5
